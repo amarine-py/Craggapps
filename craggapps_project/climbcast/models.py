@@ -3,7 +3,7 @@ from django.template.defaultfilters import slugify
 
 # Create your models here.
 
-class User(models.Model):
+class CraggUser(models.Model):
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -13,8 +13,8 @@ class User(models.Model):
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super(Category, self).save(*args, **kwargs)
+        self.slug = slugify(self.username)
+        super(CraggUser, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.username

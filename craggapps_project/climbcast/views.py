@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from climbcast.models import CraggUser
 
 # Create your views here.
 
 def index(request):
-    # Construct a dictionary to pass to the template engine as its context.
-    # Note the key boldmessage is the same as {{ boldmessage }} in the template!
-    context_dict = {'boldmessage': "Log-in Here! ... NOT!"}
+    # Query the database for a list of ALL users currently stored.
+    # Retrieve the top 5 only - or all if less than 5.
+    # Place the list in our context_dict dictionary which will be passed to the template engine.
+    user_list = CraggUser.objects.all()[:5]
+    context_dict = {'users': user_list}
 
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
@@ -16,3 +19,37 @@ def index(request):
 
 def about(request):
     return HttpResponse("This is the default about view for CraggApps\ClimbCast")
+
+def cragguser(request, user_name_slug):
+
+    # Create a context dictionary which we can pass to the template rendering engine.
+    context_dict = {}
+
+    try:
+        # Can we find a username slug with the given username?
+        # If we can't, the .get() method raises a DoesNotExist exception.
+        # So the .get() method returns one model instance or raises an exception.
+        users = CraggUser.objects.get(slug=user_name_slug)
+        context_dict['user_name'] = users.username
+
+        # Retrieve THE ASSOCIATED AREAS IN THE FUTRE. For now, attributes.
+        # Note that filter returns >= 1 model instance.
+        u_e = users.user_email
+        f_n = users.first_name
+        l_n = users.last_name
+
+        # Add the variables into the ccontext dictionary.
+        context_dict['email_address'] = u_e
+        context_dict['first_name'] = f_n
+        context_dict['last_name'] = l_n
+        # Also add the user object from the database.
+        # We will use this in the template to verify that the user exists.
+        context_dict['cragguser'] = users
+
+    except CraggUser.DoesNotExist:
+        # If user doesn't exist...
+        # Don't do anything - the template displays the "no user" message for us.
+        pass
+
+    return render(request, 'climbcast/cragguser.html', context_dict)
+

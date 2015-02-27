@@ -10,11 +10,28 @@
 
 	<body>
 		<h1>Welcome to ClimbCast</h1>
-		hello world! <br/>
-		<strong>{{ boldmessage }}</strong><br/>
+
+		<a href="/climbcast/about/">About ClimbCast</a><br/><br/>
+		
+		{% if users %}
+			
+			<ul>
+				{% for cragguser in users %}
+				<li><a href="/climbcast/cragguser/{{ cragguser.slug }}">{{ cragguser.username }}</a></li>
+				{% endfor %}
+			</ul>
+
+		{% else %}
+
+			<strong>There are no users.</strong>
+
+		{% endif %}
+
+		<br/> <br/>
+		
 		<img src="{% static "images/yahoo-weather-logo.jpg" %}" alt="Yahoo Weather Forecasts" /> <img src="{% static "images/noaa-logo.jpg" %}" alt="NOAA Weather Data" /> <img src="{% static "images/weather-channel-logo.png" %}" alt="Weather.com Forecasts" /></br>
 		</br>
-		<a href="/climbcast/about/">About ClimbCast</a><br/>
+		
 	</body>
 
 </html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>ClimbCast | User Page</title>
+	</head>
+
+	<body>
+		<h1>{{ user_name }} User Page</h1>
+		<h2>My Favorite Areas</h2>
+		{% if cragguser %}
+			<ul>
+				<li> First Name: {{ first_name }}</li>
+				<li> Last Name: {{ last_name }}</li>
+				<li> Email Address: {{ email_address }}</li>
+			</ul>
+		{% else %}
+			The specified user {{ user_name }} does not exist!
+		{% endif %}
+	</body>
+</html>
