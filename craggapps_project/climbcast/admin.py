@@ -3,4 +3,9 @@ from climbcast.models import User
 
 # Register your models here.
 
-admin.site.register(User)
+class UserAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("username",)}
+
+admin.site.register(User, UserAdmin)
+
+
