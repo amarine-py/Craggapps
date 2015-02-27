@@ -10,7 +10,11 @@ class User(models.Model):
     user_email = models.EmailField(max_length=255, unique=True)
     user_password = models.CharField(max_length=50)
     user_created = models.DateField(auto_now_add=True)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.username
