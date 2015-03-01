@@ -7,7 +7,7 @@
 
 	<body>
 		<h1>{{ user_name }} User Page</h1>
-		<h2>My Favorite Areas</h2>
+		
 		{% if cragguser %}
 			<ul>
 				<li> First Name: {{ first_name }}</li>
@@ -16,6 +16,18 @@
 			</ul>
 		{% else %}
 			The specified user {{ user_name }} does not exist!
+		{% endif %}
+		
+		<h2>My Favorite Areas</h2>
+
+		{% if user_areas %}
+			<ul>
+				{% for craggarea in user_areas %}
+				<li><a href="/climbcast/craggarea/{{ craggarea.slug }}">{{ craggarea.area_name }}</a></li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<strong>User has no favorite areas.</strong>
 		{% endif %}
 	</body>
 </html>

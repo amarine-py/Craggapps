@@ -11,7 +11,7 @@
 	<body>
 		<h1>Welcome to ClimbCast</h1>
 
-		<a href="/climbcast/about/">About ClimbCast</a><br/><br/>
+		<h2>Users</h2>
 		
 		{% if users %}
 			
@@ -27,10 +27,24 @@
 
 		{% endif %}
 
+		<h2>Areas</h2>
+
+		{% if areas %}
+			<ul>
+				{% for craggarea in areas %}
+				<li><a href="/climbcast/craggarea/{{ craggarea.slug }}">{{ craggarea.area_name }}</a></li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<strong>There are no areas.</strong>
+		{% endif %}
+
 		<br/> <br/>
 		
 		<img src="{% static "images/yahoo-weather-logo.jpg" %}" alt="Yahoo Weather Forecasts" /> <img src="{% static "images/noaa-logo.jpg" %}" alt="NOAA Weather Data" /> <img src="{% static "images/weather-channel-logo.png" %}" alt="Weather.com Forecasts" /></br>
 		</br>
+		
+		<a href="/climbcast/about/">About ClimbCast</a><br/><br/>
 		
 	</body>
 

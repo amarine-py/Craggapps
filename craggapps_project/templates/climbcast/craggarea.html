@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>ClimbCast | Area Page</title>
+	</head>
+
+	<body>
+		<h1>{{ area_name }} Page</h1>
+		
+		{% if craggarea %}
+			<ul>
+				<li> City: {{ area_city }}</li>
+				<li> State: {{ area_state }}</li>
+			</ul>
+		{% else %}
+			The specified area {{ area_name }} does not exist!
+		{% endif %}
+	</body>
+</html>

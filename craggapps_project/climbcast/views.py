@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from climbcast.models import CraggUser
+from climbcast.models import CraggUser, CraggArea
 
 # Create your views here.
 
@@ -10,6 +10,9 @@ def index(request):
     # Place the list in our context_dict dictionary which will be passed to the template engine.
     user_list = CraggUser.objects.all()[:5]
     context_dict = {'users': user_list}
+
+    area_list = CraggArea.objects.all()[:5]
+    context_dict['areas'] = area_list
 
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
@@ -33,15 +36,19 @@ def cragguser(request, user_name_slug):
         context_dict['user_name'] = users.username
 
         # Retrieve THE ASSOCIATED AREAS IN THE FUTRE. For now, attributes.
+        user_area_list = users.craggarea_set.all()
+
         # Note that filter returns >= 1 model instance.
         u_e = users.user_email
         f_n = users.first_name
         l_n = users.last_name
 
-        # Add the variables into the ccontext dictionary.
+        # Add the variables into the context dictionary.
         context_dict['email_address'] = u_e
         context_dict['first_name'] = f_n
         context_dict['last_name'] = l_n
+        context_dict['user_areas'] = user_area_list
+        
         # Also add the user object from the database.
         # We will use this in the template to verify that the user exists.
         context_dict['cragguser'] = users
@@ -53,3 +60,32 @@ def cragguser(request, user_name_slug):
 
     return render(request, 'climbcast/cragguser.html', context_dict)
 
+def craggarea(request, area_name_slug):
+
+    #Create a context dictionary that we can pass to template rendering engine
+    context_dict = {}
+
+    try:
+        # Can we find a username slug with the given area name?
+        # If we can't, the .get() method raises a DoesNotExist exception.
+        # So the .get() method returns one model instance or raises an exception.
+        areas = CraggArea.objects.get(slug=area_name_slug)
+        context_dict['area_name'] = areas.area_name
+
+        # Note that filter returns >= 1 model instance.
+        a_c = areas.area_city
+        a_s = areas.area_state
+
+        # Add variables into context dictionary.
+        context_dict['area_city'] = a_c
+        context_dict['area_state'] = a_s
+        # Also add the area object from the database.
+        # We will use this in teh template to verify that the user exists.
+        context_dict['craggarea'] = areas
+
+    except CraggArea.DoesNotExist:
+        # If area doesn't exist...
+        # Let the template handle it with a "no area" message.
+        pass
+
+    return render (request, 'climbcast/craggarea.html', context_dict)
