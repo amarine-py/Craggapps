@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from climbcast.models import CraggUser, CraggArea
+from climbcast.forms import CraggUserForm, CraggAreaForm
 
 # Create your views here.
 
@@ -89,3 +90,28 @@ def craggarea(request, area_name_slug):
         pass
 
     return render (request, 'climbcast/craggarea.html', context_dict)
+
+def add_cragg_user(request):
+    # An HTTP POST?
+    if request.method == 'POST':
+        form = CraggUserForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            # Save the new category to database.
+            form.save(commit=True)
+            
+
+            #Now call the index() view.
+            # The user will be shown the homepage.
+            return index(request)
+        else:
+            # The supplied form contained erros - just print them to the terminal.
+            print form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = CraggUserForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'climbcast/add_cragg_user.html', {'form': form})

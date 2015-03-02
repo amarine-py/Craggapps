@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> ClimbCast | Add New User</title>
+	</head>
+
+	<body>
+		<h1>Add a new CraggUser</h1>
+
+		<form id="cragg_user_form" method="POST" action="/climbcast/add_cragg_user/">
+
+		{% csrf_token %}
+		{% for hidden in form.hidden_fields %}
+			{{ hidden }}
+		{% endfor %}
+
+		{% for field in form.visible_fields %}
+			
+			{{ field.help_text }}<br/>
+			{{ field.errors }}
+			{{ field }}<br/>
+		{% endfor %}
+
+		<input type="submit" name="submit" value="Create CraggUser" />
+
+		</form>
+	</body>
+
+</html>
