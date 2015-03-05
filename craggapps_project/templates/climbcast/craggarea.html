@@ -1,20 +1,48 @@
-<!DOCTYPE html>
-<html>
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
 
-	<head>
-		<title>ClimbCast | Area Page</title>
-	</head>
+{% block title %}{{area_name}}{% endblock %}
 
-	<body>
-		<h1>{{ area_name }} Page</h1>
+{% block body_block %}
+
+	<h1>{{ area_name }} Page</h1>
+
+	{% if craggarea %}
+		<ul>
+			<li> City: {{ area_city }}</li>
+			<li> State: {{ area_state }}</li>
+			<li> Temp Celsius (Yahoo): {{ yahoo_temp_c }}</li>
+			<li> Temp Celsius (Weather.com): {{ com_temp_c }}</li>
+			<li> Temp Celsius (NOAA): {{ noaa_temp_c }}</li>
+		</ul>
+	
+	<h2>Weather.com 3-Day Forecast</h2> 
+	<h3>Highs for the week:</h3>
+
+		{% for x,y in day_temp_com %}
+			{{x}}: {{y|center:"10"}}<br/>
+		{% endfor %}
 		
-		{% if craggarea %}
-			<ul>
-				<li> City: {{ area_city }}</li>
-				<li> State: {{ area_state }}</li>
-			</ul>
-		{% else %}
-			The specified area {{ area_name }} does not exist!
-		{% endif %}
-	</body>
-</html>
+	<br/>
+	
+	<h2>Yahoo 3-Day Forecast</h2>
+	<h3>Highs for the week:</h3>
+	
+		{% for x,y in day_temp_yahoo %}
+			{{x}}: {{y|center:"10"}}<br/>
+		{% endfor %}
+		
+	<br/>
+	
+	<h2>Weather Underground 3-Day Forecast<h2/>
+	<h3>Highs for the week:</h3>
+	
+		{% for x,y in day_temp_wunder %}
+			{{x}}: {{y|center:"10"}}<br/>
+		{% endfor %}
+			
+	{% else %}
+		The specified area {{ area_name }} does not exist!
+	{% endif %}
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
+
+{% block title %}Add Cragg{% endblock %}
+
+{% block body_block %}
+
+	<h1>Add a new Cragg</h1>
+
+	<form id="cragg_area_form" method="POST" action="/climbcast/add_cragg_area/">
+
+	{% csrf_token %}
+	{% for hidden in form.hidden_fields %}
+		{{ hidden }}
+	{% endfor %}
+
+	{% for field in form.visible_fields %}
+			
+		{{ field.help_text }}<br/>
+		{{ field.errors }}
+		{{ field }}<br/>
+	{% endfor %}
+
+	<input type="submit" name="submit" value="Create Cragg" />
+
+	</form>
+{% endblock %}
+	

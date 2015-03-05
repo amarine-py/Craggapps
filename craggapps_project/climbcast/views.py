@@ -1,7 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from climbcast.models import CraggUser, CraggArea
-from climbcast.forms import CraggUserForm, CraggAreaForm
+from django.http import HttpResponseRedirect, HttpResponse
+from climbcast.models import CraggUser, CraggArea, UserProfile
+from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+import pywapi
+import urllib2
+import json
 
 # Create your views here.
 
@@ -9,7 +15,7 @@ def index(request):
     # Query the database for a list of ALL users currently stored.
     # Retrieve the top 5 only - or all if less than 5.
     # Place the list in our context_dict dictionary which will be passed to the template engine.
-    user_list = CraggUser.objects.all()[:5]
+    user_list = UserProfile.objects.all()[:5]
     context_dict = {'users': user_list}
 
     area_list = CraggArea.objects.all()[:5]
@@ -22,10 +28,9 @@ def index(request):
     return render(request, 'climbcast/index.html', context_dict)
 
 def about(request):
-    return HttpResponse("This is the default about view for CraggApps\ClimbCast")
+    return render(request, 'climbcast/about.html', {})
 
-def cragguser(request, user_name_slug):
-
+'''def cragguser(request, user_name_slug):
     # Create a context dictionary which we can pass to the template rendering engine.
     context_dict = {}
 
@@ -40,7 +45,7 @@ def cragguser(request, user_name_slug):
         user_area_list = users.craggarea_set.all()
 
         # Note that filter returns >= 1 model instance.
-        u_e = users.user_email
+        u_e = users.email
         f_n = users.first_name
         l_n = users.last_name
 
@@ -60,7 +65,7 @@ def cragguser(request, user_name_slug):
         pass
 
     return render(request, 'climbcast/cragguser.html', context_dict)
-
+'''
 def craggarea(request, area_name_slug):
 
     #Create a context dictionary that we can pass to template rendering engine
@@ -71,15 +76,98 @@ def craggarea(request, area_name_slug):
         # If we can't, the .get() method raises a DoesNotExist exception.
         # So the .get() method returns one model instance or raises an exception.
         areas = CraggArea.objects.get(slug=area_name_slug)
+        weather_yahoo = pywapi.get_weather_from_yahoo(areas.area_zip)
+        weather_com = pywapi.get_weather_from_weather_com(areas.area_zip)
+        weather_noaa = pywapi.get_weather_from_noaa(areas.area_noaa_station_code)
+        weather_wunder = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/forecast/q/' + areas.area_zip +'.json')
+        wunder_string = weather_wunder.read()
+        wunder_parsed = json.loads(wunder_string)
         context_dict['area_name'] = areas.area_name
 
         # Note that filter returns >= 1 model instance.
         a_c = areas.area_city
         a_s = areas.area_state
+        temp_c_yahoo = weather_yahoo['condition']['temp']
+        temp_c_com = weather_com['current_conditions']['temperature']
+        temp_c_noaa = weather_noaa['temp_c']
 
+        # Create empty lists for Weather.com forecast data
+        forecast_high_c_com = []
+        forecast_dayofweek_com = []
+        day_temp_com = []
+
+        # Populate forecast temps in celsius and convert fo fahrenheit (Weather.com)
+        for x in range(1,4):
+            forecast_high_c_com.append((int(weather_com['forecasts'][x]['high']) * 9/5) + 32)
+
+        # Populate days of week
+        for x in range(1,4):
+            forecast_dayofweek_com.append(weather_com['forecasts'][x]['day_of_week'])
+
+        # Zip the lists together for display
+        day_temp_com = zip(forecast_dayofweek_com, forecast_high_c_com)
+
+        # Create empty lists for Weather Underground forecast data
+        forecast_high_f_wunder = []
+        forecast_dayofweek_wunder = []
+        day_temp_wunder = []
+
+        # Populate forecast temps in farhenheit (Weather Underground)
+        for x in range(1,4):
+            forecast_high_f_wunder.append(wunder_parsed['forecast']['simpleforecast']['forecastday'][x]['high']['fahrenheit'])
+
+        # Populate days of week
+        for x in range(1,4):
+            forecast_dayofweek_wunder.append(wunder_parsed['forecast']['simpleforecast']['forecastday'][x]['date']['weekday'])
+                                          
+        # Zip the lists together for display
+        day_temp_wunder = zip(forecast_dayofweek_wunder, forecast_high_f_wunder)
+
+        # Create empty lists for Yahoo forecast data
+        forecast_high_c_yahoo = []
+        forecast_dayofweek_yahoo = []
+        day_temp_yahoo = []
+
+        # Populate forecast temps in fahrenheit (Yahoo)
+        for x in range(1,4):
+            forecast_high_c_yahoo.append((int(weather_yahoo['forecasts'][x]['high']) * 9/5) + 32)
+
+        # Populate days of week
+        for x in range(1,4):
+            forecast_dayofweek_yahoo.append(weather_yahoo['forecasts'][x]['day'])
+
+        # Convert to full name of day of week
+        for day in forecast_dayofweek_yahoo:
+            if x == 'Thu':
+                x = 'Thursday'
+            elif x == 'Fri':
+                x = 'Friday'
+            elif x == 'Sat':
+                x = 'Saturday'
+            elif x == 'Sun':
+                x = 'Sunday'
+            elif x == 'Mon':
+                x = 'Monday'
+            elif x == 'Tue':
+                x = 'Tuesday'
+            else:
+                x = 'Wednesday'
+
+        # Zip the lists together for display
+        day_temp_yahoo = zip(forecast_dayofweek_yahoo, forecast_high_c_yahoo)
+        
         # Add variables into context dictionary.
         context_dict['area_city'] = a_c
         context_dict['area_state'] = a_s
+        context_dict['yahoo_temp_c'] = temp_c_yahoo
+        context_dict['com_temp_c'] = temp_c_com
+        context_dict['noaa_temp_c'] = temp_c_noaa
+        #context_dict['com_high_c_forecast'] = forecast_high_c_com
+        #context_dict['com_dayofweek'] = forecast_dayofweek_com
+        context_dict['day_temp_com'] = day_temp_com
+        context_dict['day_temp_yahoo'] = day_temp_yahoo
+        context_dict['day_temp_wunder'] = day_temp_wunder
+        
         # Also add the area object from the database.
         # We will use this in teh template to verify that the user exists.
         context_dict['craggarea'] = areas
@@ -92,13 +180,64 @@ def craggarea(request, area_name_slug):
     return render (request, 'climbcast/craggarea.html', context_dict)
 
 def add_cragg_user(request):
+    # Boolean value for telling template whether registration was successful.
+    registered = False
+    
     # An HTTP POST?
     if request.method == 'POST':
-        form = CraggUserForm(request.POST)
+        user_form = UserForm(data=request.POST)
+        profile_form = UserProfileForm(data=request.POST)
+
+        # Have we been provided with a valid form?
+        if user_form.is_valid() and profile_form.is_valid():
+            # Save the new user to database.
+            user = user_form.save(commit=True)
+
+            #Now we hash the password.
+            user.set_password(user.password)
+            user.save()
+
+            # Now sort out the UserProfile instance.
+            # Since we need to set the user attribute ourselves, we set commit=False.
+            # This delays saving the model until we're ready to avoid integrity problems.
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            # Did the user provide a profile picture?
+            # If so, we need to get it from the input form and put it in the UserProfile model.
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            # Now we can save instance.
+            profile.save()
+
+            # Update variable to tell template of success.
+            registered = True
+            
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print user_form.errors
+            print profile_form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request,
+            'climbcast/add_cragg_user.html', {'user_form': user_form, 'profile_form': profile_form,
+            'registered': registered})
+
+@login_required
+def add_cragg_area(request):
+    # An HTTP POST?
+    if request.method == 'POST':
+        form = CraggAreaForm(request.POST)
 
         # Have we been provided with a valid form?
         if form.is_valid():
-            # Save the new category to database.
+            # Save the new Cragg to database.
             form.save(commit=True)
             
 
@@ -106,12 +245,73 @@ def add_cragg_user(request):
             # The user will be shown the homepage.
             return index(request)
         else:
-            # The supplied form contained erros - just print them to the terminal.
+            # The supplied form contained errors - just print them to the terminal.
             print form.errors
     else:
         # If the request was not a POST, display the form to enter details.
-        form = CraggUserForm()
+        form = CraggAreaForm()
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
-    return render(request, 'climbcast/add_cragg_user.html', {'form': form})
+    return render(request, 'climbcast/add_cragg_area.html', {'form': form})
+    
+def user_login(request):
+
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == 'POST':
+        # Gather the username and password provided by the user.
+        # This information is obtained from the login form.
+                # We use request.POST.get('<variable>') as opposed to request.POST['<variable>'],
+                # because the request.POST.get('<variable>') returns None, if the value does not exist,
+                # while the request.POST['<variable>'] will raise key error exception
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Use Django's machinery to attempt to see if the username/password
+        # combination is valid - a User object is returned if it is.
+        user = authenticate(username=username, password=password)
+
+        # If we have a User object, the details are correct.
+        # If None (Python's way of representing the absence of a value), no user
+        # with matching credentials was found.
+        if user:
+            # Is the account active? It could have been disabled.
+            if user.is_active:
+                # If the account is valid and active, we can log the user in.
+                # We'll send the user back to the homepage.
+                login(request, user)
+                return HttpResponseRedirect('/climbcast/')
+            else:
+                # An inactive account was used - no logging in!
+                return HttpResponse("Your Rango account is disabled.")
+        else:
+            # Bad login details were provided. So we can't log the user in.
+            print "Invalid login details: {0}, {1}".format(username, password)
+            return HttpResponse("Invalid login details supplied.")
+
+    # The request is not a HTTP POST, so display the login form.
+    # This scenario would most likely be a HTTP GET.
+    else:
+        # No context variables to pass to the template system, hence the
+        # blank dictionary object...
+        return render(request, 'climbcast/login.html', {})
+
+@login_required
+def user_logout(request):
+    # Since we know the user must be logged in, we can now log them out
+    logout(request)
+
+    # Take user back to homepage
+    return HttpResponseRedirect('/climbcast/')
+
+
+
+
+
+
+
+
+
+
+
+        

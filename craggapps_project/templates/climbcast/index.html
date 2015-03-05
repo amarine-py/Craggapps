@@ -1,53 +1,30 @@
-<!DOCTYPE html>
+{% extends 'climbcast/base.html' %}
 
 {% load staticfiles %}
 
-<html>
+{% block body_block %}
 
-	<head>
-	<title>ClimbCast</title>
-	</head>
-
-	<body>
-		<h1>Welcome to ClimbCast</h1>
-
-		<h2>Users</h2>
+	{% if user.is_authenticated %}
+	<h1>Welcome to ClimbCast, {{user.username}}!</h1>
+	
+	{% else %}
+	<h1>Welcome to ClimbCast!</h1>
 		
-		{% if users %}
-			
-			<ul>
-				{% for cragguser in users %}
-				<li><a href="/climbcast/cragguser/{{ cragguser.slug }}">{{ cragguser.username }}</a></li>
-				{% endfor %}
-			</ul>
+	{% endif %}
 
-		{% else %}
-
-			<strong>There are no users.</strong>
-
-		{% endif %}
-
-		<h2>Areas</h2>
+	<h2>Areas</h2>
 
 		{% if areas %}
-			<ul>
-				{% for craggarea in areas %}
-				<li><a href="/climbcast/craggarea/{{ craggarea.slug }}">{{ craggarea.area_name }}</a></li>
-				{% endfor %}
-			</ul>
-		{% else %}
-			<strong>There are no areas.</strong>
-		{% endif %}
+		<ul>
+			{% for craggarea in areas %}
+			<li><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<strong>There are no areas.</strong>
+	{% endif %}
+	<br/> <br/> <hr/>
+	<img src="{% static "images/yahoo-weather-logo.jpg" %}" alt="Yahoo Weather Forecasts" /> <img src="{% static "images/noaa-logo.jpg" %}" alt="NOAA Weather Data" /> <img src="{% static "images/weather-channel-logo.png" %}" alt="Weather.com Forecasts" /></br>
+	</br>
 
-		<br/> <br/>
-		
-		<img src="{% static "images/yahoo-weather-logo.jpg" %}" alt="Yahoo Weather Forecasts" /> <img src="{% static "images/noaa-logo.jpg" %}" alt="NOAA Weather Data" /> <img src="{% static "images/weather-channel-logo.png" %}" alt="Weather.com Forecasts" /></br>
-		</br>
-		
-		
-		<a href="/climbcast/add_cragg_user/">Add new CraggUser</a></br/>
-		<a href="/climbcast/about/">About ClimbCast</a><br/><br/>
-		
-	</body>
-
-</html>
+{% endblock %}

@@ -1,29 +1,30 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title> ClimbCast | Add New User</title>
-	</head>
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
 
-	<body>
-		<h1>Add a new CraggUser</h1>
+{% block title %}Add User{% endblock %}
 
-		<form id="cragg_user_form" method="POST" action="/climbcast/add_cragg_user/">
+{% block body_block %}
 
-		{% csrf_token %}
-		{% for hidden in form.hidden_fields %}
-			{{ hidden }}
-		{% endfor %}
+	<h1>Add a new CraggApps User</h1>
 
-		{% for field in form.visible_fields %}
-			
-			{{ field.help_text }}<br/>
-			{{ field.errors }}
-			{{ field }}<br/>
-		{% endfor %}
+	{% if registered %}
+	<strong>Thank you for registering!</strong>
+	<a href="{% url 'climbcast' %}">Return to homepage</a><br/>
+	{% else %}
+	<h3>Register new CraggApps user here:</h3>
 
-		<input type="submit" name="submit" value="Create CraggUser" />
+	<form id="user_form" method="POST" action="/climbcast/add_cragg_user/", enctype="multipart/form-data">
 
-		</form>
-	</body>
+	{% csrf_token %}
+	
+	{{ user_form.as_p }}
+	{{ profile_form.as_p }}
 
-</html>
+	<input type="submit" name="submit" value="Create CraggUser" />
+
+	</form>
+	{% endif %}
+
+{% endblock %}
+
+	
