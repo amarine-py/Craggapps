@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'climbcast/base.html' %}
 {% load staticfiles %}
 
 {% block title %}{{user_name}}{% endblock %}
 
 {% block body_block %}
 
-	<h1>{{ user_name }} User Page</h1>
+	<h1>{{ user_name }} profile page</h1>
 	
 	{% if cragguser %}
 		<ul>
@@ -17,11 +17,12 @@
 		The specified user {{ user_name }} does not exist!
 	{% endif %}
 	
-	<h2>{{user_name}}'s Favorite Areas</h2>
+	<h2>{{user_name}}'s favorite areas</h2>
 		{% if user_areas %}
 		<ul>
 			{% for craggarea in user_areas %}
-			<li><a href="{% url 'craggarrea' %}{{ craggarea.slug }}">{{ craggarea.area_name }}</a></li>
+			<li><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></li>
+			{% include "climbcast/include_area.html" with weather=craggarea.get_weather %}
 			{% endfor %}
 		</ul>
 	{% else %}

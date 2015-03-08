@@ -1,0 +1,32 @@
+		<ul>
+			<li> City: {{ weather.area_city }}</li>
+			<li> State: {{ weather.area_state }}</li>
+			<li> Temp Celsius (Yahoo): {{ weather.yahoo_temp_f }}</li>
+			<li> Temp Celsius (Weather.com): {{ weather.com_temp_f }}</li>
+			<li> Temp Celsius (Weather Underground): {{ weather.wunder_temp_f }}</li>
+		</ul>
+	
+	<h2>Weather.com 3-Day Forecast</h2> 
+	<h3>Highs for the week:</h3>
+
+		{% for x,y in weather.day_temp_com %}
+			{{x}}: {{y|center:"10"}}<br/>
+		{% endfor %}
+		
+	<br/>
+	
+	<h2>Yahoo 3-Day Forecast</h2>
+	<h3>Highs for the week:</h3>
+	
+		{% for x,y in weather.day_temp_yahoo %}
+			{{x}}: {{y|center:"10"}}<br/>
+		{% endfor %}
+		
+	<br/>
+	
+	<h2>Weather Underground 3-Day Forecast<h2/>
+	<h3>Highs for the week:</h3>
+	
+		{% for x,y in weather.day_temp_wunder %}
+			{{x}}: {{y|center:"10"}}<br/>
+		{% endfor %}

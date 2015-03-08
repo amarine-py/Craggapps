@@ -9,6 +9,7 @@ import pywapi
 import urllib2
 import json
 
+    
 # Create your views here.
 
 def index(request):
@@ -30,7 +31,8 @@ def index(request):
 def about(request):
     return render(request, 'climbcast/about.html', {})
 
-'''def cragguser(request, user_name_slug):
+def cragguser(request, user_name_slug):
+    
     # Create a context dictionary which we can pass to the template rendering engine.
     context_dict = {}
 
@@ -38,16 +40,16 @@ def about(request):
         # Can we find a username slug with the given username?
         # If we can't, the .get() method raises a DoesNotExist exception.
         # So the .get() method returns one model instance or raises an exception.
-        users = CraggUser.objects.get(slug=user_name_slug)
-        context_dict['user_name'] = users.username
+        users = UserProfile.objects.get(slug=user_name_slug)
+        context_dict['user_name'] = users.user.username
 
         # Retrieve THE ASSOCIATED AREAS IN THE FUTRE. For now, attributes.
         user_area_list = users.craggarea_set.all()
 
         # Note that filter returns >= 1 model instance.
-        u_e = users.email
-        f_n = users.first_name
-        l_n = users.last_name
+        u_e = users.user.email
+        f_n = users.user.first_name
+        l_n = users.user.last_name
 
         # Add the variables into the context dictionary.
         context_dict['email_address'] = u_e
@@ -57,7 +59,7 @@ def about(request):
         
         # Also add the user object from the database.
         # We will use this in the template to verify that the user exists.
-        context_dict['cragguser'] = users
+        context_dict['cragguser'] = users       
 
     except CraggUser.DoesNotExist:
         # If user doesn't exist...
@@ -65,20 +67,19 @@ def about(request):
         pass
 
     return render(request, 'climbcast/cragguser.html', context_dict)
-'''
+
 def craggarea(request, area_name_slug):
 
     #Create a context dictionary that we can pass to template rendering engine
     context_dict = {}
 
     try:
-        # Can we find a username slug with the given area name?
+        # Can we find an area slug with the given area name?
         # If we can't, the .get() method raises a DoesNotExist exception.
         # So the .get() method returns one model instance or raises an exception.
         areas = CraggArea.objects.get(slug=area_name_slug)
         weather_yahoo = pywapi.get_weather_from_yahoo(areas.area_zip)
         weather_com = pywapi.get_weather_from_weather_com(areas.area_zip)
-        weather_noaa = pywapi.get_weather_from_noaa(areas.area_noaa_station_code)
         weather_wunder = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/forecast/q/' + areas.area_zip +'.json')
         wunder_string = weather_wunder.read()
         wunder_parsed = json.loads(wunder_string)
@@ -87,9 +88,12 @@ def craggarea(request, area_name_slug):
         # Note that filter returns >= 1 model instance.
         a_c = areas.area_city
         a_s = areas.area_state
-        temp_c_yahoo = weather_yahoo['condition']['temp']
-        temp_c_com = weather_com['current_conditions']['temperature']
-        temp_c_noaa = weather_noaa['temp_c']
+        temp_f_yahoo = (int(weather_yahoo['condition']['temp']) * 9/5) + 32
+        temp_f_com = (int(weather_com['current_conditions']['temperature']) * 9/5) + 32
+        wunder_current = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/conditions/q/' + areas.area_zip +'.json')
+        wunder_current_string = wunder_current.read()
+        wunder_current_parsed = json.loads(wunder_current_string)
+        temp_f_wunder = int(wunder_current_parsed['current_observation']['temp_f'])
 
         # Create empty lists for Weather.com forecast data
         forecast_high_c_com = []
@@ -159,11 +163,9 @@ def craggarea(request, area_name_slug):
         # Add variables into context dictionary.
         context_dict['area_city'] = a_c
         context_dict['area_state'] = a_s
-        context_dict['yahoo_temp_c'] = temp_c_yahoo
-        context_dict['com_temp_c'] = temp_c_com
-        context_dict['noaa_temp_c'] = temp_c_noaa
-        #context_dict['com_high_c_forecast'] = forecast_high_c_com
-        #context_dict['com_dayofweek'] = forecast_dayofweek_com
+        context_dict['yahoo_temp_f'] = temp_f_yahoo
+        context_dict['com_temp_f'] = temp_f_com
+        context_dict['wunder_temp_f'] = temp_f_wunder
         context_dict['day_temp_com'] = day_temp_com
         context_dict['day_temp_yahoo'] = day_temp_yahoo
         context_dict['day_temp_wunder'] = day_temp_wunder
@@ -172,12 +174,42 @@ def craggarea(request, area_name_slug):
         # We will use this in teh template to verify that the user exists.
         context_dict['craggarea'] = areas
 
+        # Is area a favorite of current user?
+        current_user = UserProfile.objects.get(user__username=request.user)
+        user_list = areas.cragg_users.all()
+        
+        if current_user in user_list:
+            user_favorite = True
+        else:
+            user_favorite = False
+
+        context_dict['user_favorite'] = user_favorite
+        context_dict['current_user'] = current_user
+
     except CraggArea.DoesNotExist:
         # If area doesn't exist...
         # Let the template handle it with a "no area" message.
         pass
 
     return render (request, 'climbcast/craggarea.html', context_dict)
+
+def add_to_favorites(request, area_name_slug):
+    # This view adds a given cragg to a user's favorites list.
+    area = CraggArea.objects.get(slug=area_name_slug)
+    user_list = area.cragg_users.all()
+    current_user = UserProfile.objects.get(user__username=request.user)
+    user_favorite = True
+
+    if current_user not in user_list:
+        area.cragg_users.add(current_user)
+        area.save()
+        user_favorite = True
+    else:
+        user_favorite = False
+
+    
+    # Return control to the craggarea view and pass it the area_name_slug.
+    return craggarea(request, area_name_slug)
 
 def add_cragg_user(request):
     # Boolean value for telling template whether registration was successful.
@@ -303,6 +335,9 @@ def user_logout(request):
 
     # Take user back to homepage
     return HttpResponseRedirect('/climbcast/')
+
+
+
 
 
 
