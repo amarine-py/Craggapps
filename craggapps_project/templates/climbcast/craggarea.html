@@ -16,7 +16,7 @@
 	{% endif %}
 	
 	{% if craggarea %}
-		{% include "climbcast/include_area.html" %}
+		{% include "climbcast/include_area.html" with weather=craggarea.get_weather %}
 			
 	{% else %}
 		The specified area {{ area_name }} does not exist!

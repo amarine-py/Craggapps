@@ -21,7 +21,7 @@
 		{% if user_areas %}
 		<ul>
 			{% for craggarea in user_areas %}
-			<li><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></li>
+			<h1><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></h1>
 			{% include "climbcast/include_area.html" with weather=craggarea.get_weather %}
 			{% endfor %}
 		</ul>
