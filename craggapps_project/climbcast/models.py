@@ -164,22 +164,72 @@ class Route(models.Model):
     pitches = models.CharField(max_length=3, blank=True)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=30)
-    area1 = models.CharField(max_length=50)
+    area1 = models.CharField(max_length=50, null=True)
     area2 = models.CharField(max_length=50)
     area3 = models.CharField(max_length=50)
     area4 = models.CharField(max_length=50)
     area5 = models.CharField(max_length=50)
     mp_url = models.URLField(unique=True, blank=True)
-    image_small_url = models.URLField(blank=True)
-    image_medium_url = models.URLField(blank=True)
-    image_small = models.ImageField()
-    image_medium = models.ImageField()
+    image_small_url = models.URLField(blank=True, null=True)
+    image_medium_url = models.URLField(blank=True, null=True)
+    image_small = models.ImageField(null=True)
+    image_medium = models.ImageField(null=True)
     slug = models.SlugField(unique=True, blank=False)
     users = models.ManyToManyField(UserProfile)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Route, self).save(*args, **kwargs)
+
+    def get_route_data(self):
+        # This function gets the MP data for a route given it's unique mp_id.
+        MP_API_KEY = '&key=106762537-cdd76cb5153460d85b3d72fcdc3391a5'
+        action = 'getRoutes&routeIds='
+        mp_api_url = 'https://www.mountainproject.com/data?action='
+        request_string = mp_api_url + action + self.mp_id + MP_API_KEY
+        mp_request = urllib2.urlopen(request_string)
+        mp_string = mp_request.read()
+        parse = json.loads(mp_string)
+        mp_request.close()
+
+        self.name = parse['routes'][0]['name']
+        self.style = parse['routes'][0]['type']
+        self.rating = parse['routes'][0]['rating']
+        self.stars = parse['routes'][0]['stars']
+        self.star_votes = parse['routes'][0]['starVotes']
+        self.pitches = parse['routes'][0]['pitches']
+        self.city = parse['routes'][0]['location'][1]
+        self.state = parse['routes'][0]['location'][0]
+        self.mp_url = parse['routes'][0]['url']
+        self.image_small_url = parse['routes'][0]['imgSmall']
+        self.image_medium_url = parse['routes'][0]['imgMed']
+
+        area_list = []
+
+        for x in range(0,len(parse['routes'][0]['location'])):
+            area_list[x] = parse['routes'][0]['location'][x]
+
+        length_of_area_list = len(area_list)
+        if length_of_area_list == 0:
+            self.area1 = None
+        elif length_of_area_list == 1:
+            self.area1 = area_list[0]
+        elif length_of_area_list == 2:
+            self.area1 = area_list[0]
+            self.area2 = area_list[1]
+        elif length_of_area_list == 2:
+            self.area1 = area_list[0]
+            self.area2 = area_list[1]
+            self.area3 = area_list[2]
+        elif length_of_area_list == 3:
+            self.area1 = area_list[0]
+            self.area2 = area_list[1]
+            self.area3 = area_list[2]
+            self.area4 = area_list[3]
+        else:
+            pass
+
+                
 
     def __unicode__(self):
         return self.name
