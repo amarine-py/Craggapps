@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from climbcast.models import CraggUser, CraggArea, UserProfile
-from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm
+from climbcast.models import CraggUser, CraggArea, UserProfile, Route
+from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm, RouteForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
+from django.core.urlresolvers import reverse_lazy
 import pywapi
 import urllib2
 import json
@@ -22,11 +25,19 @@ def index(request):
     area_list = CraggArea.objects.all()[:5]
     context_dict['areas'] = area_list
 
+    # Get the number of visits to the site.
+    # We use the COOKIES.get() function to obtain the visits cookie.
+    # If the cookie exists, the value returned is casted to an integer.
+    # If the cookie doesn't exist, we default to zero and cast that.
+    visits = int(request.COOKIES.get('visits','1'))
+    reset_last_visit_time = False
+    response = render(request, 'climbcast/index.html', context_dict)
+    #HERHEEHRERHEH
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
     # Note that the first parameter is the template we wish to use.
 
-    return render(request, 'climbcast/index.html', context_dict)
+    #return render(request, 'climbcast/index.html', context_dict)
 
 def about(request):
     return render(request, 'climbcast/about.html', {})
@@ -286,6 +297,54 @@ def add_cragg_area(request):
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
     return render(request, 'climbcast/add_cragg_area.html', {'form': form})
+
+
+class AddRoute(CreateView):
+    model = Route
+    form_class = RouteForm
+    template_name = 'climbcast/route_form.html'
+    success_url = '/climbcast/'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AddRoute, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        route_creater = form.save(commit=False)
+        route_creater.created_by = self.request.user
+        route_creater.save()
+        return HttpResponseRedirect(AddRoute.get_success_url())
+
+class UpdateRoute(UpdateView):
+    model = Route
+    form_class = RouteForm
+
+
+    '''
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(add_route, self).dispatch(*args, **kwargs)
+    
+    def get(self, request):
+        form = self.form_class(initial=self.initial)    
+        
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            route = form.save(commit=False)
+
+            if 'image_medium' in request.FILES:
+                route.image_medium = request.FILES['image_medium']
+
+            route.save()
+            updated = True
+            return HttpResponseRedirect('/climbcast/')
+            
+        return render(request, self.template_name, {'form': form, 'updated': updated})
+        '''
     
 def user_login(request):
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 import pywapi
 import urllib2
 import json
@@ -155,7 +156,7 @@ class CraggArea(models.Model):
         return self.area_name
 
 class Route(models.Model):
-    mp_id = models.CharField(max_length=9, unique=True)
+    mp_id = models.CharField(max_length=9, blank=True, unique=True)
     name = models.CharField(max_length=100, unique=False)
     style = models.CharField(max_length=10, unique=False, blank=True)
     rating = models.CharField(max_length=15)
@@ -164,21 +165,22 @@ class Route(models.Model):
     pitches = models.CharField(max_length=3, blank=True)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=30)
-    area1 = models.CharField(max_length=50, null=True)
-    area2 = models.CharField(max_length=50)
-    area3 = models.CharField(max_length=50)
-    area4 = models.CharField(max_length=50)
-    area5 = models.CharField(max_length=50)
+    area1 = models.CharField(max_length=50, blank=True, null=True)
+    area2 = models.CharField(max_length=50, blank =True, null=True)
+    area3 = models.CharField(max_length=50, blank=True, null=True)
+    area4 = models.CharField(max_length=50, blank=True, null=True)
+    area5 = models.CharField(max_length=50, blank=True, null=True)
     mp_url = models.URLField(unique=True, blank=True)
     image_small_url = models.URLField(blank=True, null=True)
     image_medium_url = models.URLField(blank=True, null=True)
-    image_small = models.ImageField(null=True)
-    image_medium = models.ImageField(null=True)
+    image_small = models.ImageField(null=True, blank=True)
+    image_medium = models.ImageField(null=True, blank=True)
     slug = models.SlugField(unique=True, blank=False)
-    users = models.ManyToManyField(UserProfile)
+    users = models.ManyToManyField(UserProfile, null=True, blank=True)
+    created_by = models.ForeignKey(User, blank=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.slug = slugify(self.name) + '-' + str(self.pk)
         super(Route, self).save(*args, **kwargs)
 
     def get_route_data(self):
@@ -229,8 +231,9 @@ class Route(models.Model):
         else:
             pass
 
-                
-
+    def get_absolute_url(self):
+        return reverse('route-detail', kwargs={'pk': self.pk})
+    
     def __unicode__(self):
         return self.name
     

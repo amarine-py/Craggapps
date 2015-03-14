@@ -2,14 +2,9 @@ from django import forms
 from climbcast.models import CraggUser, CraggArea, UserProfile, Route
 from django.contrib.auth.models import User
 
-ROUTE_TYPE_CHOICES = ('Trad', 'Sport', 'Ice', 'Mixed', 'Dry', 'Aid', 'Tope Rope', 'Snow')
-ROUTE_RATING_CHOICES = ('Third Class', 'Fourth Class', 'Easy Snow', 'Moderate Snow', 'Difficult Snow',
-                        'C1', 'C2', 'C3', 'C4', 'C5', 'WI2', 'WI3', 'WI4', 'WI5', 'WI6', 'M3', 'M4',
-                        'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', '5.3', '5.4',
-                        '5.5', '5.6', '5.7', '5.8', '5.9', '5.10a', '5.10b', '5.10c', '5.10d', '5.11a',
-                        '5.11b', '5.11c', '5.11d', '5.12a', '5.12b', '5.12c', '5.12d', '5.13a', '5.13b',
-                        '5.13c', '5.13d', '5.14a', '5.14b', '5.14c', '5.14d', '5.15a')
-ROUTE_STARS_CHOICES = ('0', '1', '2', '3', '4')
+
+
+
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -46,20 +41,54 @@ class UserProfileForm(forms.ModelForm):
         fields = ('picture',)
 
 class RouteForm(forms.ModelForm):
-    mp_id = forms.CharField(max_length=9, required=False, help_text='Enter unique MountainProject.com route ID.')
-    name = forms.CharField(max_length=100, required=True, help_text='Enter name of route.')
-    style = forms.CharField(widget=forms.CheckboxSelectMultiple, choices=ROUTE_TYPE_CHOICE, help_text='Select type of route.')
-    rating = forms.CharField(widget=forms.CheckboxSelectMultiple, choices=ROUTE_RATING_CHOICES, help_text='Select difficult rating.')
-    stars = forms.CharField(widget=forms.RadioSelect, choices=ROUTE_STARS_CHOICES, help_text='How many stars does this route deserve?')
-    pitches = forms.CharField(max_length=3, help_text='Enter number of pitches.')
-    city = forms.CharField(max_length=50, help_text='Enter name of city.')
-    state = forms.CharField(widget=forms.Select, choices=STATE_CHOICES, help_text='Choose state.') )
-    mp_url = forms.URLField(required=False, widget=forms.URLInput, help_text='Enter unique MountainProject.com URL for route.')
-    image_medium = forms.ImageField(required=False, widget=forms.FileInput, help_text='Choose a picture for the route.')
+    # Define choices constants for form.
+    ROUTE_TYPE_CHOICES = (('trad','Trad'), ('sport','Sport'), ('ice','Ice'),
+                      ('mixed','Mixed'), ('dry','Dry'), ('aid','Aid'),
+                      ('top rope','Tope Rope'), ('snow','Snow'))
+    ROUTE_RATING_CHOICES = (('third class','Third Class'), ('fourth class','Fourth Class'),
+                        ('easy snow','Easy Snow'), ('moderate snow','Moderate Snow'),
+                        ('difficult snow','Difficult Snow'),('C1','C1'), ('C2','C2'),
+                        ('C3','C3'), ('C4','C4'), ('C5','C5'), ('WI2','WI2'), ('WI3','WI3'),
+                        ('WI4','WI4'), ('WI5','WI5'), ('WI6','WI6'), ('M3','M3'), ('M4','M4'),
+                        ('M5','M5'), ('M6','M6'), ('M7','M7'), ('M8','M8'), ('M9','M9'),
+                        ('M10','M10'), ('M11','M11'), ('M12','M12'), ('M13','M13'), ('M14','M14'),
+                        ('5.3','5.3'), ('5.4','5.4'), ('5.5','5.5'), ('5.6','5.6'), ('5.7','5.7'),
+                        ('5.8','5.8'), ('5.9','5.9'), ('5.10a','5.10a'), ('5.10b','5.10b'),
+                        ('5.10c','5.10c'), ('5.10d','5.10d'), ('5.11a','5.11a'), ('5.11b','5.11b'),
+                        ('5.11c','5.11c'), ('5.11d','5.11d'), ('5.12a','5.12a'), ('5.12b','5.12b'),
+                        ('5.12c','5.12c'), ('5.12d','5.12d'), ('5.13a','5.13a'), ('5.13b','5.13b'),
+                        ('5.13c','5.13c'), ('5.13d','5.13d'), ('5.14a','5.14a'), ('5.14b','5.14b'),
+                        ('5.14c','5.14c'), ('5.14d','5.14d'), ('5.15a','5.15a'))
+    ROUTE_STARS_CHOICES = [('0','0'), ('1','1'), ('2','2'), ('3','3'), ('4','4')]
+    STATE_CHOICES = [("AL","Alabama"), ("AK","Alaska"), ("AZ","Arizona"), ("AR","Arkansas"),
+                 ("CA","California"), ("CO","Colorado"), ("CT","Connecticut"), ("DC","District of Columbia"),
+                 ("DE","Delaware!"), ("FL","Florida"), ("GA","Georgia"), ("HI","Hawaii"),
+                 ("ID","Idaho"), ("IL","Illinois"), ("IN","Indiana"), ("IA","Iowa"),
+                 ("KS","Kansas"), ("KY","Kentucky"), ("LA","Louisiana"), ("ME","Maine"),
+                 ("MD","Maryland"), ("MA","Massachusetts"), ("MI","Michigan"), ("MN","Minnesota"),
+                 ("MS","Mississippi"), ("MO","Missouri"), ("MT","Montana"), ("NE","Nebraska"),
+                 ("NV","Nevada"), ("NH","New Hampshire"), ("NJ","New Jersey"), ("NM","New Mexico"),
+                 ("NY","New York"), ("NC","North Carolina"), ("ND","North Dakota"), ("OH","Ohio"),
+                 ("OK","Oklahoma"), ("OR","Oregon"), ("PA","Pennsylvania"), ("RI","Rhode Island"),
+                 ("SC","South Carolina"), ("SD","South Dakota"), ("TN","Tennessee"), ("TX","Texas"),
+                 ("UT","Utah"), ("VT","Vermont"), ("VA","Virginia"), ("WA","Washington"),
+                 ("WV","West Virginia"), ("WI","Wisconsin"), ("WY","Wyoming")]
+        
+    mp_id = forms.CharField(max_length=9, required=False, label='Enter unique MountainProject.com route ID.')
+    name = forms.CharField(max_length=100, required=True, label='Enter name of route.')
+    style = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=ROUTE_TYPE_CHOICES, label='Choose the type of route this is.')
+    rating = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=ROUTE_RATING_CHOICES, label='Select difficulty rating.')
+    stars = forms.ChoiceField(widget=forms.RadioSelect, choices=ROUTE_STARS_CHOICES, label='How many stars does this route deserve?')
+    pitches = forms.CharField(max_length=3, label='Enter number of pitches.')
+    city = forms.CharField(max_length=50, label='Enter the name of the closest city.')
+    state = forms.ChoiceField(widget=forms.Select, choices=STATE_CHOICES, label='Choose the state this route is in.')
+    mp_url = forms.URLField(required=False, widget=forms.URLInput, label='Enter unique MountainProject.com URL for route.')
+    image_medium = forms.ImageField(required=False, widget=forms.FileInput, label='Choose a cover picture for the route.')
     
     class Meta:
         # Provides an association between the ModelForm and the model.
         model = Route
+        exclude = ('created_by',)
         fields = ('mp_id', 'name', 'style', 'rating', 'stars', 'pitches', 'city', 'state',
                   'mp_url', 'image_medium')
 

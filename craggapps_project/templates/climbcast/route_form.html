@@ -1,0 +1,20 @@
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
+
+{% block title %}Add Route{% endblock %}
+
+{% block body_block %}
+
+	<h1>Add a new Route </h1>
+
+	<form id="form" method="POST" action="/climbcast/route/add/", enctype="multipart/form-data">
+
+	{% csrf_token %}
+	
+	{{ form.as_p }}
+
+	<input type="submit" name="submit" value="Add Route" />
+
+	</form>
+
+{% endblock %}

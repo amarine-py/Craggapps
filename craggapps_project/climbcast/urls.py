@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, url
 from climbcast import views
+from climbcast.views import AddRoute, UpdateRoute
+
 
 urlpatterns = patterns('',
         url(r'^$', views.index, name='index'),
@@ -11,5 +13,6 @@ urlpatterns = patterns('',
         url(r'^add_to_favorites/(?P<area_name_slug>[\w\-]+)/$', views.add_to_favorites, name='add_to_favorites'),
         url(r'^login/$', views.user_login, name='login'),
         url(r'^logout/$', views.user_logout, name='logout'),
+        url(r'^route/add/$', AddRoute.as_view(), name='route_form'),
         
 )
