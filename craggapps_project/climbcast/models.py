@@ -25,6 +25,7 @@ class UserProfile(models.Model):
         self.slug = slugify(self.user.username)
         super(UserProfile, self).save(*args, **kwargs)
 
+'''
 class CraggUser(models.Model):
     username = models.CharField(max_length=30, unique=True)
     slug = models.SlugField(unique=True)
@@ -36,6 +37,7 @@ class CraggUser(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.username)
         super(CraggUser, self).save(*args, **kwargs)
+'''
 
 class CraggArea(models.Model):
     area_name = models.CharField(max_length=50, unique=True)

@@ -1,10 +1,6 @@
 from django import forms
-from climbcast.models import CraggUser, CraggArea, UserProfile, Route
+from climbcast.models import CraggArea, UserProfile, Route
 from django.contrib.auth.models import User
-
-
-
-
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())

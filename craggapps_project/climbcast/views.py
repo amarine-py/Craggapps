@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from climbcast.models import CraggUser, CraggArea, UserProfile, Route
+from climbcast.models import CraggArea, UserProfile, Route
 from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm, RouteForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -37,7 +37,7 @@ def index(request):
     # We make use of the shortcut function to make our lives easier.
     # Note that the first parameter is the template we wish to use.
 
-    #return render(request, 'climbcast/index.html', context_dict)
+    return render(request, 'climbcast/index.html', context_dict)
 
 def about(request):
     return render(request, 'climbcast/about.html', {})
@@ -222,7 +222,7 @@ def add_to_favorites(request, area_name_slug):
     # Return control to the craggarea view and pass it the area_name_slug.
     return craggarea(request, area_name_slug)
 
-def add_cragg_user(request):
+'''def add_cragg_user(request):
     # Boolean value for telling template whether registration was successful.
     registered = False
     
@@ -271,6 +271,7 @@ def add_cragg_user(request):
     return render(request,
             'climbcast/add_cragg_user.html', {'user_form': user_form, 'profile_form': profile_form,
             'registered': registered})
+'''
 
 @login_required
 def add_cragg_area(request):
@@ -346,7 +347,7 @@ class UpdateRoute(UpdateView):
         return render(request, self.template_name, {'form': form, 'updated': updated})
         '''
     
-def user_login(request):
+'''def user_login(request):
 
     # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == 'POST':
@@ -394,6 +395,7 @@ def user_logout(request):
 
     # Take user back to homepage
     return HttpResponseRedirect('/climbcast/')
+'''
 
 
 
