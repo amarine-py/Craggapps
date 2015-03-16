@@ -4,8 +4,9 @@
 {% block title %}{{area_name}}{% endblock %}
 
 {% block body_block %}
-
+<div class="page-header">
 	<h1>{{ area_name }} Page</h1>
+</div>
 	You are {{ current_user }}
 	{% if user.is_authenticated %}
 		{% if not user_favorite %}

@@ -210,8 +210,8 @@ class Route(models.Model):
 
         area_list = []
 
-        for x in range(0,len(parse['routes'][0]['location'])):
-            area_list[x] = parse['routes'][0]['location'][x]
+        for area in parse['routes'][0]['location']:
+            area_list.append(parse['routes'][0]['location'])
 
         length_of_area_list = len(area_list)
         if length_of_area_list == 0:

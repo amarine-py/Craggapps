@@ -4,9 +4,10 @@
 {% block title %}{{user_name}}{% endblock %}
 
 {% block body_block %}
+<div class="page-header">
 
 	<h1>{{ user_name }} profile page</h1>
-	
+</div>	
 	{% if cragguser %}
 		<ul>
 			<li> First Name: {{ first_name }}</li>
@@ -28,5 +29,4 @@
 	{% else %}
 		<strong>User has no favorite areas.</strong>
 	{% endif %}
-	
 {% endblock %}

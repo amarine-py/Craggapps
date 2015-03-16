@@ -5,26 +5,40 @@
 {% block body_block %}
 
 	{% if user.is_authenticated %}
+<div class="page-header">
 	<h1>Welcome to ClimbCast, {{user.username}}!</h1>
 	
 	{% else %}
 	<h1>Welcome to ClimbCast!</h1>
-		
+</div>		
 	{% endif %}
-
-	<h2>Areas</h2>
-
-		{% if areas %}
-		<ul>
-			{% for craggarea in areas %}
-			<li><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></li>
-			{% endfor %}
-		</ul>
-	{% else %}
-		<strong>There are no areas.</strong>
-	{% endif %}
-	<br/> <br/> <hr/>
-	<img src="{% static "images/yahoo-weather-logo.jpg" %}" alt="Yahoo Weather Forecasts" /> <img src="{% static "images/wunder-logo.jpg" %}" alt="Weather Underground Data" /> <img src="{% static "images/weather-channel-logo.png" %}" alt="Weather.com Forecasts" /></br>
-	</br>
+<div class="row placeholders">
+	<div class="col-xs-12 col-sm-6 placeholder">
+		<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h4>Areas</h4>
+		</div>
+		</div>
+				{% if areas %}
+				<ul class="list-group">
+					{% for craggarea in areas %}
+					<li class="list-group-item"><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<strong>There are no areas.</strong>
+			{% endif %}
+	</div>
+	<div class="col-xs-12 col-sm-6 placeholder">
+		<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h4>What goes here?</h4>	
+		</div>
+		</div>
+	</div>
+</div>
+		</hr>
+		<img src="{% static "images/yahoo-weather-logo.jpg" %}" alt="Yahoo Weather Forecasts" /> <img src="{% static "images/wunder-logo.jpg" %}" alt="Weather Underground Data" /> <img src="{% static "images/weather-channel-logo.png" %}" alt="Weather.com Forecasts" /></br>
+		</br>
 
 {% endblock %}

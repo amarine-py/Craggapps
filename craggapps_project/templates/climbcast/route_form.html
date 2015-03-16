@@ -4,9 +4,9 @@
 {% block title %}Add Route{% endblock %}
 
 {% block body_block %}
-
+<div class="page-header">
 	<h1>Add a new Route </h1>
-
+</div>
 	<form id="form" method="POST" action="/climbcast/route/add/", enctype="multipart/form-data">
 
 	{% csrf_token %}
@@ -16,5 +16,4 @@
 	<input type="submit" name="submit" value="Add Route" />
 
 	</form>
-
 {% endblock %}
