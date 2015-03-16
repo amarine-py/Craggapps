@@ -15,13 +15,14 @@ class CraggAreaForm(forms.ModelForm):
     area_city = forms.CharField(max_length=50, required=False, help_text="Enter city of cragg.")
     area_zip = forms.CharField(max_length=5, required=False, help_text="Enter zip code of cragg, if known.")
     slug = forms.CharField(widget=forms.HiddenInput(), required=False)
+    cover_image = forms.ImageField(required=False, widget=forms.FileInput, help_text="Choose a cover picture for the area.")
     #cragg_users = forms.ManyToManyField(widget=forms.HiddenInput(), required=False)
 
 
     class Meta:
         # Provide an association between the ModelForm and model.        
         model = CraggArea
-        fields = ('area_name', 'area_state', 'area_city', 'area_zip', 'area_noaa_station_code', 'cover_image',)
+        fields = ('area_name', 'area_state', 'area_city', 'area_zip', 'cover_image',)
         # What fields do we want to include in our form?
         # This way we don't need every field in the model present.
         # Some fields may allow NULL values, so we may not want to include them...
@@ -70,16 +71,16 @@ class RouteForm(forms.ModelForm):
                  ("UT","Utah"), ("VT","Vermont"), ("VA","Virginia"), ("WA","Washington"),
                  ("WV","West Virginia"), ("WI","Wisconsin"), ("WY","Wyoming")]
         
-    mp_id = forms.CharField(max_length=9, required=False, label='Enter unique MountainProject.com route ID.')
-    name = forms.CharField(max_length=100, required=True, label='Enter name of route.')
-    style = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=ROUTE_TYPE_CHOICES, label='Choose the type of route this is.')
-    rating = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=ROUTE_RATING_CHOICES, label='Select difficulty rating.')
-    stars = forms.ChoiceField(widget=forms.RadioSelect, choices=ROUTE_STARS_CHOICES, label='How many stars does this route deserve?')
-    pitches = forms.CharField(max_length=3, label='Enter number of pitches.')
-    city = forms.CharField(max_length=50, label='Enter the name of the closest city.')
-    state = forms.ChoiceField(widget=forms.Select, choices=STATE_CHOICES, label='Choose the state this route is in.')
-    mp_url = forms.URLField(required=False, widget=forms.URLInput, label='Enter unique MountainProject.com URL for route.')
-    image_medium = forms.ImageField(required=False, widget=forms.FileInput, label='Choose a cover picture for the route.')
+    mp_id = forms.CharField(max_length=9, required=False, help_text='Enter unique MountainProject.com route ID.')
+    name = forms.CharField(max_length=100, required=True, help_text='Enter name of route.')
+    style = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=ROUTE_TYPE_CHOICES, help_text='Choose the type of route this is.')
+    rating = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=ROUTE_RATING_CHOICES, help_text='Select difficulty rating.')
+    stars = forms.ChoiceField(widget=forms.RadioSelect, choices=ROUTE_STARS_CHOICES, help_text='How many stars does this route deserve?')
+    pitches = forms.CharField(max_length=3, help_text='Enter number of pitches.')
+    city = forms.CharField(max_length=50, help_text='Enter the name of the closest city.')
+    state = forms.ChoiceField(widget=forms.Select, choices=STATE_CHOICES, help_text='Choose the state this route is in.')
+    mp_url = forms.URLField(required=False, widget=forms.URLInput, help_text='Enter unique MountainProject.com URL for route.')
+    image_medium = forms.ImageField(required=False, widget=forms.FileInput, help_text='Choose a cover picture for the route.')
     
     class Meta:
         # Provides an association between the ModelForm and the model.

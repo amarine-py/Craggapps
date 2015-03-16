@@ -4,26 +4,23 @@
 {% block title %}Add Cragg{% endblock %}
 
 {% block body_block %}
-<div class="page-header">
-	<h1>Add a new Cragg</h1>
-</div>
 
-	<form id="cragg_area_form" method="POST" action="/climbcast/add_cragg_area/">
-
+<form role="form" id="cragg_area_form" method="POST" action="/climbcast/add_cragg_area/">
+<h2 class="form-signin-heading">Add a Cragg</h2>
 	{% csrf_token %}
 	{% for hidden in form.hidden_fields %}
 		{{ hidden }}
 	{% endfor %}
 
 	{% for field in form.visible_fields %}
-			
-		{{ field.help_text }}<br/>
 		{{ field.errors }}
-		{{ field }}<br/>
+		{{ field.help_text }}<br/>
+		{{ field }}<br/><br/>
 	{% endfor %}
-
-	<input type="submit" name="submit" value="Create Cragg" />
-
-	</form>
+	
+	</br>
+	
+<button class="btn btn-primary"  type="submit" name="submit">Create Cragg</button>
+</form>
 {% endblock %}
 	
