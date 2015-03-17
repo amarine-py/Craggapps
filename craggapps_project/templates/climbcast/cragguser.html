@@ -18,15 +18,22 @@
 		The specified user {{ user_name }} does not exist!
 	{% endif %}
 	
-	<h2>{{user_name}}'s favorite areas</h2>
+	<h2>{{user_name}}'s most recent ticks</h2>
+		{% if user_ticks %}
+		<ul>
+			{% for tick in user_ticks %}
+				{% include "climbcast/include_ticks.html" with t=tick %}
+			{% endfor %}
+		{% endif %}
+	<!--<h2>{{user_name}}'s favorite areas</h2>
 		{% if user_areas %}
 		<ul>
 			{% for craggarea in user_areas %}
-			<h1><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></h1>
-			{% include "climbcast/include_area.html" with weather=craggarea.get_weather %}
+				<h1><a href="{% url 'craggarea' craggarea.slug %}">{{ craggarea.area_name }}</a></h1>
+				{% include "climbcast/include_area.html" with weather=craggarea.get_weather %}
 			{% endfor %}
 		</ul>
 	{% else %}
 		<strong>User has no favorite areas.</strong>
-	{% endif %}
+	{% endif %} -->
 {% endblock %}

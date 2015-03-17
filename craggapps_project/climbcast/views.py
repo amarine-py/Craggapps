@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from climbcast.models import CraggArea, UserProfile, Route
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick
 from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm, RouteForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -52,10 +52,14 @@ def cragguser(request, user_name_slug):
         # If we can't, the .get() method raises a DoesNotExist exception.
         # So the .get() method returns one model instance or raises an exception.
         users = UserProfile.objects.get(slug=user_name_slug)
+        user_link = User.objects.get(username=users.user.username)
         context_dict['user_name'] = users.user.username
 
         # Retrieve THE ASSOCIATED AREAS IN THE FUTRE. For now, attributes.
         user_area_list = users.craggarea_set.all()
+
+        # Retrieve the user's ticks
+        user_tick_list = user_link.routetick_set.all()
 
         # Note that filter returns >= 1 model instance.
         u_e = users.user.email
@@ -67,12 +71,13 @@ def cragguser(request, user_name_slug):
         context_dict['first_name'] = f_n
         context_dict['last_name'] = l_n
         context_dict['user_areas'] = user_area_list
+        context_dict['user_ticks'] = user_tick_list
         
         # Also add the user object from the database.
         # We will use this in the template to verify that the user exists.
         context_dict['cragguser'] = users       
 
-    except CraggUser.DoesNotExist:
+    except User.DoesNotExist:
         # If user doesn't exist...
         # Don't do anything - the template displays the "no user" message for us.
         pass

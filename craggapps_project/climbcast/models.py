@@ -178,7 +178,7 @@ class Route(models.Model):
     image_small = models.ImageField(null=True, blank=True)
     image_medium = models.ImageField(null=True, blank=True)
     slug = models.SlugField(unique=True, blank=False)
-    users = models.ManyToManyField(UserProfile, null=True, blank=True)
+    #users = models.ManyToManyField(UserProfile, null=True, blank=True)
     created_by = models.ForeignKey(User, blank=True)
 
     def save(self, *args, **kwargs):
@@ -239,7 +239,16 @@ class Route(models.Model):
     def __unicode__(self):
         return self.name
     
+class RouteTick(models.Model):
+    user_tick = models.ForeignKey(User, blank=False)
+    route = models.ForeignKey(Route, blank=False)
+    date_of_tick = models.DateField(blank=False)
+    user_star_vote = models.CharField(max_length=3, blank=False)
+    ascent_style = models.CharField(max_length=15, blank=False)
+    difficulty_vote = models.CharField(max_length=15, blank=True, null=True)
 
+    def __unicode__(self):
+        return self.user_tick.username + "--" + self.route.name + "--" + str(self.date_of_tick)
         
 
 

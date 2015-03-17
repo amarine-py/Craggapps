@@ -1,5 +1,5 @@
 from django.contrib import admin
-from climbcast.models import CraggArea, UserProfile, Route
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick
 from django.contrib.auth.models import User
 
 
@@ -21,10 +21,14 @@ class CraggAreaAdmin(admin.ModelAdmin):
 class RouteAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name", "mp_id")}
 
+class RouteTickAdmin(admin.ModelAdmin):
+    pass
+
 # admin.site.register(CraggUser, CraggUserAdmin)
 admin.site.register(CraggArea, CraggAreaAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Route, RouteAdmin)
+admin.site.register(RouteTick, RouteTickAdmin)
 
 
 
