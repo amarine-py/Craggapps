@@ -10,7 +10,7 @@ import json
 # Create your models here.
 
 class UserProfile(models.Model):
-    # This line is required. Links UserProfile to a User model instance.
+    # Links UserProfile to a User model instance.
     user = models.OneToOneField(User)
 
     # The additional attributes we wish to include.
@@ -24,6 +24,29 @@ class UserProfile(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.user.username)
         super(UserProfile, self).save(*args, **kwargs)
+
+class UserWeatherData(models.Model):
+    '''This class is used to keep the weather preferences for each User
+       and use them to calculate their climbing options based on weather.
+    '''
+    # First we link this to a user
+    user = models.OneToOneField(User)
+    
+    # How tolerant of heat is the user (1-5)?
+    # First we define the choices list of tuples:
+    HEAT_TOLERANCE_CHOICES = (('1','1'),('2','2'),('3','3'),('4','4'),('5','5'))
+    heat_tolerance = models.CharField(max_length=2, choices=HEAT_TOLERANCE_CHOICES, default='3')
+
+    # How tolerant of cold is the user (1-5)?
+    # First we define the choices list of tuples:
+    COLD_TOLERANCE_CHOICES = (('1','1'),('2','2'),('3','3'),('4','4'),('5','5'))
+    cold_tolerance = models.CharField(max_length=2, choices=COLD_TOLERANCE_CHOICES, default='3')
+
+    # Does the user mind windy conditions?
+    mind_windy = models.NullBooleanField(default=None)
+
+    def __unicode__(self):
+        return self.user.username + "--Weather Condition Preferences"
 
 '''
 class CraggUser(models.Model):
@@ -248,7 +271,7 @@ class RouteTick(models.Model):
     difficulty_vote = models.CharField(max_length=15, blank=True, null=True)
 
     def __unicode__(self):
-        return self.user_tick.username + "--" + self.route.name + "--" + str(self.date_of_tick)
+        return self.user_tick.username + "--" + self.route.name + "--" + self.ascent_style + "--" + str(self.date_of_tick)
         
 
 

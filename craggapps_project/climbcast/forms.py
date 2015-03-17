@@ -1,5 +1,5 @@
 from django import forms
-from climbcast.models import CraggArea, UserProfile, Route
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick, UserWeatherData
 from django.contrib.auth.models import User
 
 class UserForm(forms.ModelForm):
@@ -23,14 +23,7 @@ class CraggAreaForm(forms.ModelForm):
         # Provide an association between the ModelForm and model.        
         model = CraggArea
         fields = ('area_name', 'area_state', 'area_city', 'area_zip', 'cover_image',)
-        # What fields do we want to include in our form?
-        # This way we don't need every field in the model present.
-        # Some fields may allow NULL values, so we may not want to include them...
-        # Here, we are hiding the foreign key.
-        # we can either exclude the category field from the form,
-        # NEVERMIND - Coudn't get the EXCLUDE to work, so I made it hidden.
-        # or specify the fields to include (i.e. not include the cragg)users field)
-        # fields = ('area_name', 'area_state', 'area_city')
+
 
 class UserProfileForm(forms.ModelForm):
     class Meta:

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from climbcast.models import CraggArea, UserProfile, Route, RouteTick
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick, UserWeatherData
 from django.contrib.auth.models import User
 
 
@@ -24,11 +24,16 @@ class RouteAdmin(admin.ModelAdmin):
 class RouteTickAdmin(admin.ModelAdmin):
     pass
 
+class UserWeatherDataAdmin(admin.ModelAdmin):
+    pass
+
 # admin.site.register(CraggUser, CraggUserAdmin)
 admin.site.register(CraggArea, CraggAreaAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Route, RouteAdmin)
 admin.site.register(RouteTick, RouteTickAdmin)
+admin.site.register(UserWeatherData, UserWeatherDataAdmin)
+
 
 
 

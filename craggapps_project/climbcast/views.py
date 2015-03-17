@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from climbcast.models import CraggArea, UserProfile, Route, RouteTick
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick, UserWeatherData
 from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm, RouteForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+from django.views.decorators.cache import cache_page
 import pywapi
 import urllib2
 import json
@@ -84,6 +85,15 @@ def cragguser(request, user_name_slug):
 
     return render(request, 'climbcast/cragguser.html', context_dict)
 
+class UpdateUser(UpdateView):
+    model = User
+    template_name_suffix = '_update_form'
+    template_name = 'climbcast/user_update_form.html'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    
 def craggarea(request, area_name_slug):
 
     #Create a context dictionary that we can pass to template rendering engine
