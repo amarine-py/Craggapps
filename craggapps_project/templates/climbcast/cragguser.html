@@ -6,14 +6,25 @@
 {% block body_block %}
 <div class="page-header">
 
-	<h1>{{ user_name }} profile page</h1>
+	<h1>{{ user_name }}'s profile page</h1>
+	
+	
 </div>	
 	{% if cragguser %}
+	<h3>User info</h3>
 		<ul>
 			<li> First Name: {{ first_name }}</li>
 			<li> Last Name: {{ last_name }}</li>
 			<li> Email Address: {{ email_address }}</li>
 		</ul>
+		<p><a href="{% url 'user_update_form' user_pk %}">Edit user info</a></p>
+	<h3>User weather preferences</h3>
+		<ul>
+			<li> Heat Tolerance: {{ heat }}</li>
+			<li> Cold Tolerance: {{ cold }}</li>
+			<li> Mind Windy?: {{ mind_wind }}</li>
+		</ul>
+		<p><a href="{% url 'userprofile_update_form' slug %}">Edit user weather preferences</a></p>
 	{% else %}
 		The specified user {{ user_name }} does not exist!
 	{% endif %}

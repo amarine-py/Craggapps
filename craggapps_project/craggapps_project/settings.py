@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: "/climbcast/cragguser/%s/" % u.userprofile.slug,
+}
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -107,6 +109,15 @@ ACCOUNT_ACTIVATION_DAYS = 7     # One-week activation window; you may, of course
 REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
 LOGIN_REDIRECT_URL = '/climbcast/'  # The page you want users to arrive at after they successful log in
 LOGIN_URL = '/accounts/login/'  # The page users are directed to if they are not logged in, and are trying to access pages requiring authentication
+
+PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.CryptPasswordHasher',
+)
 
 CACHES = {
     'default': {

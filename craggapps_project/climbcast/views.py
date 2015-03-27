@@ -1,14 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
-from climbcast.models import CraggArea, UserProfile, Route, RouteTick, UserWeatherData
-from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm, RouteForm
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick
+from climbcast.forms import CraggAreaForm, UserForm, UserProfileForm, RouteForm, UpdateUserForm, UpdateUserProfileForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.decorators.cache import cache_page
+from django.forms.models import inlineformset_factory
 import pywapi
 import urllib2
 import json
@@ -56,6 +57,17 @@ def cragguser(request, user_name_slug):
         user_link = User.objects.get(username=users.user.username)
         context_dict['user_name'] = users.user.username
 
+        # Get the User model PK to send to template
+        context_dict['user_pk'] = users.user.pk
+
+        # Get the slug for the template
+        context_dict['slug'] = users.slug
+
+        # Get UserProfile weather preferences
+        heat = users.heat_tolerance
+        cold = users.cold_tolerance
+        mind_wind = users.mind_windy
+
         # Retrieve THE ASSOCIATED AREAS IN THE FUTRE. For now, attributes.
         user_area_list = users.craggarea_set.all()
 
@@ -73,6 +85,9 @@ def cragguser(request, user_name_slug):
         context_dict['last_name'] = l_n
         context_dict['user_areas'] = user_area_list
         context_dict['user_ticks'] = user_tick_list
+        context_dict['heat'] = heat
+        context_dict['cold'] = cold
+        context_dict['mind_wind'] = mind_wind
         
         # Also add the user object from the database.
         # We will use this in the template to verify that the user exists.
@@ -85,13 +100,25 @@ def cragguser(request, user_name_slug):
 
     return render(request, 'climbcast/cragguser.html', context_dict)
 
+class UpdateUserProfile(UpdateView):
+    model = UserProfile
+    template_name = 'climbcast/userprofile_update_form.html'
+    form_class = UpdateUserProfileForm
+    slug_url_kwarg = 'user_name_slug'
+    
+
+
 class UpdateUser(UpdateView):
     model = User
-    template_name_suffix = '_update_form'
     template_name = 'climbcast/user_update_form.html'
-
-    def get_object(self, queryset=None):
-        return self.request.user
+    form_class = UserForm
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super(UpdateUser, self).get_context_data(**kwargs)
+        me = self.request.user
+        context['user_name_slug'] = me.userprofile
+        return context
 
     
 def craggarea(request, area_name_slug):

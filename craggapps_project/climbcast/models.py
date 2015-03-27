@@ -9,6 +9,7 @@ import json
 
 # Create your models here.
 
+
 class UserProfile(models.Model):
     # Links UserProfile to a User model instance.
     user = models.OneToOneField(User)
@@ -17,21 +18,10 @@ class UserProfile(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     picture = models.ImageField(upload_to='profile_images', blank=True)
 
-    # Override the __unicode__() method to return out something meaningful!
-    def __unicode__(self):
-        return self.user.username
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.user.username)
-        super(UserProfile, self).save(*args, **kwargs)
-
-class UserWeatherData(models.Model):
-    '''This class is used to keep the weather preferences for each User
-       and use them to calculate their climbing options based on weather.
     '''
-    # First we link this to a user
-    user = models.OneToOneField(User)
-    
+    This part of the model is used to keep the weather preferences for
+    each User and use them to calculate their climbing options based on weather.
+    '''
     # How tolerant of heat is the user (1-5)?
     # First we define the choices list of tuples:
     HEAT_TOLERANCE_CHOICES = (('1','1'),('2','2'),('3','3'),('4','4'),('5','5'))
@@ -45,22 +35,16 @@ class UserWeatherData(models.Model):
     # Does the user mind windy conditions?
     mind_windy = models.NullBooleanField(default=None)
 
-    def __unicode__(self):
-        return self.user.username + "--Weather Condition Preferences"
-
-'''
-class CraggUser(models.Model):
-    username = models.CharField(max_length=30, unique=True)
-    slug = models.SlugField(unique=True)
-
     # Override the __unicode__() method to return out something meaningful!
     def __unicode__(self):
-        return self.username
-    
+        return self.user.username
+
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.username)
-        super(CraggUser, self).save(*args, **kwargs)
-'''
+        self.slug = slugify(self.user.username)
+        super(UserProfile, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return "/climbcast/cragguser/%s/" % self.slug
 
 class CraggArea(models.Model):
     area_name = models.CharField(max_length=50, unique=True)

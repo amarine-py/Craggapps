@@ -1,13 +1,13 @@
 from django import forms
-from climbcast.models import CraggArea, UserProfile, Route, RouteTick, UserWeatherData
+from climbcast.models import CraggArea, UserProfile, Route, RouteTick
 from django.contrib.auth.models import User
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
-
+    
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'email', 'password',)
+        fields = ('first_name', 'last_name', 'username', 'email',)
+        exclude = ['password',]
         
 class CraggAreaForm(forms.ModelForm):
     area_name = forms.CharField(max_length=50, help_text="Enter name of cragg.")
@@ -28,7 +28,7 @@ class CraggAreaForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ('picture',)
+        fields = ('picture', 'heat_tolerance', 'cold_tolerance', 'mind_windy')
 
 class RouteForm(forms.ModelForm):
     # Define choices constants for form.
@@ -82,4 +82,16 @@ class RouteForm(forms.ModelForm):
         fields = ('mp_id', 'name', 'style', 'rating', 'stars', 'pitches', 'city', 'state',
                   'mp_url', 'image_medium')
 
+class UpdateUserForm(forms.ModelForm):
+    success_url = '/cragguser/'
     
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password')
+        
+class UpdateUserProfileForm(forms.ModelForm):
+    success_url = '/cragguser/'
+
+    class Meta:
+        model = UserProfile
+        fields = ('heat_tolerance', 'cold_tolerance', 'mind_windy')

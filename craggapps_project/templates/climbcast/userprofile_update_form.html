@@ -5,11 +5,14 @@
 {% block body_block %}
 
 
-<form role="form" id="userform" action="" method="post">
+<form role="form" id="userprofileform" action="" method="post">
 	{% csrf_token %}
     {{ form.as_p }}
 	<button class="btn btn-primary" type="submit" name="submit">Update</button>
-    <!--<input type="submit" value="Update" />-->
 </form>	
 
 {% endblock %}
+
+
+
+
