@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from climbcast import views
-from climbcast.views import AddRoute, UpdateRoute, UpdateUser, UpdateUserProfile
+from climbcast.views import AddRoute, UpdateRoute, UpdateUser, UpdateUserProfile, TickDetailView
 from django.views.decorators.cache import cache_page
 
 
@@ -19,5 +19,7 @@ urlpatterns = patterns('',
             UpdateUser.as_view(), name='user_update_form'),
         url(r'^cragguser/update/userprofile/(?P<user_name_slug>[\w\-]+)/$',
             UpdateUserProfile.as_view(), name='userprofile_update_form'),
+        url(r'^cragguser/(?P<user_name_slug>[\w\-]+)/ticks/(?P<pk>[\w\-]+)/(?P<slug>[\w\-]+)/$',
+            TickDetailView.as_view(), name='routetick_detail'),
         
 )

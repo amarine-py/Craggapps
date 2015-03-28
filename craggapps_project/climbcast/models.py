@@ -253,9 +253,16 @@ class RouteTick(models.Model):
     user_star_vote = models.CharField(max_length=3, blank=False)
     ascent_style = models.CharField(max_length=15, blank=False)
     difficulty_vote = models.CharField(max_length=15, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True)
 
     def __unicode__(self):
         return self.user_tick.username + "--" + self.route.name + "--" + self.ascent_style + "--" + str(self.date_of_tick)
-        
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.route)
+        super(RouteTick, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return "/climbcast/cragguser/%s/%d/%s/" % self.user_tick.userprofile.slug, self.pk, self.slug
 
 

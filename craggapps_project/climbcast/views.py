@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
+from django.views.generic.detail import DetailView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.decorators.cache import cache_page
 from django.forms.models import inlineformset_factory
@@ -72,7 +73,7 @@ def cragguser(request, user_name_slug):
         user_area_list = users.craggarea_set.all()
 
         # Retrieve the user's ticks
-        user_tick_list = user_link.routetick_set.all()
+        user_tick_list = user_link.routetick_set.all()[:10]
 
         # Note that filter returns >= 1 model instance.
         u_e = users.user.email
@@ -264,56 +265,6 @@ def add_to_favorites(request, area_name_slug):
     # Return control to the craggarea view and pass it the area_name_slug.
     return craggarea(request, area_name_slug)
 
-'''def add_cragg_user(request):
-    # Boolean value for telling template whether registration was successful.
-    registered = False
-    
-    # An HTTP POST?
-    if request.method == 'POST':
-        user_form = UserForm(data=request.POST)
-        profile_form = UserProfileForm(data=request.POST)
-
-        # Have we been provided with a valid form?
-        if user_form.is_valid() and profile_form.is_valid():
-            # Save the new user to database.
-            user = user_form.save(commit=True)
-
-            #Now we hash the password.
-            user.set_password(user.password)
-            user.save()
-
-            # Now sort out the UserProfile instance.
-            # Since we need to set the user attribute ourselves, we set commit=False.
-            # This delays saving the model until we're ready to avoid integrity problems.
-            profile = profile_form.save(commit=False)
-            profile.user = user
-
-            # Did the user provide a profile picture?
-            # If so, we need to get it from the input form and put it in the UserProfile model.
-            if 'picture' in request.FILES:
-                profile.picture = request.FILES['picture']
-
-            # Now we can save instance.
-            profile.save()
-
-            # Update variable to tell template of success.
-            registered = True
-            
-        else:
-            # The supplied form contained errors - just print them to the terminal.
-            print user_form.errors
-            print profile_form.errors
-    else:
-        # If the request was not a POST, display the form to enter details.
-        user_form = UserForm()
-        profile_form = UserProfileForm()
-
-    # Bad form (or form details), no form supplied...
-    # Render the form with error messages (if any).
-    return render(request,
-            'climbcast/add_cragg_user.html', {'user_form': user_form, 'profile_form': profile_form,
-            'registered': registered})
-'''
 
 @login_required
 def add_cragg_area(request):
@@ -389,55 +340,11 @@ class UpdateRoute(UpdateView):
         return render(request, self.template_name, {'form': form, 'updated': updated})
         '''
     
-'''def user_login(request):
+class TickDetailView(DetailView):
+    model = RouteTick
+    slug_url_kwarg = 'slug'
+    template_name = 'climbcast/routetick_detail.html'
 
-    # If the request is a HTTP POST, try to pull out the relevant information.
-    if request.method == 'POST':
-        # Gather the username and password provided by the user.
-        # This information is obtained from the login form.
-                # We use request.POST.get('<variable>') as opposed to request.POST['<variable>'],
-                # because the request.POST.get('<variable>') returns None, if the value does not exist,
-                # while the request.POST['<variable>'] will raise key error exception
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        # Use Django's machinery to attempt to see if the username/password
-        # combination is valid - a User object is returned if it is.
-        user = authenticate(username=username, password=password)
-
-        # If we have a User object, the details are correct.
-        # If None (Python's way of representing the absence of a value), no user
-        # with matching credentials was found.
-        if user:
-            # Is the account active? It could have been disabled.
-            if user.is_active:
-                # If the account is valid and active, we can log the user in.
-                # We'll send the user back to the homepage.
-                login(request, user)
-                return HttpResponseRedirect('/climbcast/')
-            else:
-                # An inactive account was used - no logging in!
-                return HttpResponse("Your Rango account is disabled.")
-        else:
-            # Bad login details were provided. So we can't log the user in.
-            print "Invalid login details: {0}, {1}".format(username, password)
-            return HttpResponse("Invalid login details supplied.")
-
-    # The request is not a HTTP POST, so display the login form.
-    # This scenario would most likely be a HTTP GET.
-    else:
-        # No context variables to pass to the template system, hence the
-        # blank dictionary object...
-        return render(request, 'climbcast/login.html', {})
-
-@login_required
-def user_logout(request):
-    # Since we know the user must be logged in, we can now log them out
-    logout(request)
-
-    # Take user back to homepage
-    return HttpResponseRedirect('/climbcast/')
-'''
 
 
 

@@ -3,6 +3,10 @@ from climbcast.models import CraggArea, UserProfile, Route, RouteTick
 from django.contrib.auth.models import User
 
 class UserForm(forms.ModelForm):
+    first_name = forms.CharField(help_text="Enter first name of user.")
+    last_name = forms.CharField(help_text="Enter last name of user.")
+    username = forms.CharField(help_text="Enter a unique username.")
+    email = forms.EmailField(help_text="Enter a valid email address.")
     
     class Meta:
         model = User
@@ -90,8 +94,14 @@ class UpdateUserForm(forms.ModelForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password')
         
 class UpdateUserProfileForm(forms.ModelForm):
+    HEAT_TOLERANCE_CHOICES = (('1','1'),('2','2'),('3','3'),('4','4'),('5','5'))
+    COLD_TOLERANCE_CHOICES = (('1','1'),('2','2'),('3','3'),('4','4'),('5','5'))
+    heat_tolerance = forms.ChoiceField(widget=forms.Select, choices=HEAT_TOLERANCE_CHOICES, help_text="What is your tolerance for heat?")
+    cold_tolerance = forms.ChoiceField(choices=COLD_TOLERANCE_CHOICES, help_text="What is your tolerance for cold?")
+    mind_windy = forms.NullBooleanField(help_text="Do you mind climbing in windy conditions?")
+    picture = forms.ImageField(required=False, widget=forms.FileInput, help_text="Choose a profile picture (optional).")
     success_url = '/cragguser/'
 
     class Meta:
         model = UserProfile
-        fields = ('heat_tolerance', 'cold_tolerance', 'mind_windy')
+        fields = ('heat_tolerance', 'cold_tolerance', 'mind_windy', 'picture',)

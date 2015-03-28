@@ -1,0 +1,20 @@
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
+
+{% block title %}Ascent of {{t.route.name }}{% endblock %}
+
+{% block body_block %}
+
+<div class="page-header">
+<h1>Route name: {{ object.route.name }}</h1>
+</div>
+
+<p>Area: {{ object.route.area1 }}</p>
+<p>Date of ascent: {{ object.date_of_tick }}</p>
+<p>Style: {{ object.route.style }}</p>
+<p>Consensus difficulty: {{ object.route.rating }}</p>
+<p>Your difficulty: {{ object.difficulty_vote }}</p>
+<p>Consensus rating: {{ object.route.stars }}</p>
+<p>Your rating: {{ object.user_star_vote }}</p>
+
+{% endblock %}

@@ -1,12 +1,3 @@
-		<ul>
-			<li> Route name: {{ t.route.name }}</li>
-			<li> Area: {{ t.route.area1 }}</li>
-			<li> Date of ascent: {{ t.date_of_tick }}</li>
-			<li> Style: {{ t.route.style }}</li>
-			<li> Consensus difficulty: {{ t.route.rating }}</li>
-			<li> Your difficulty: {{ t.difficulty_vote }}</li>
-			<li> Consensus rating: {{ t.route.stars }}</li>
-			<li> Your rating: {{ t.user_star_vote }}</li>
-			
-		</ul>
+Route name: <a href="{% url 'routetick_detail' t.user_tick.userprofile.slug t.pk t.slug %}">{{ t.route.name }}</a>
+	
 	

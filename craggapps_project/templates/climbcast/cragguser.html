@@ -29,13 +29,13 @@
 		The specified user {{ user_name }} does not exist!
 	{% endif %}
 	
-	<h2>{{user_name}}'s most recent ticks</h2>
+	<h3>{{user_name}}'s most recent ticks</h3>
 		{% if user_ticks %}
-		<ul>
 			{% for tick in user_ticks %}
-				{% include "climbcast/include_ticks.html" with t=tick %}
+			{% include "climbcast/include_ticks.html" with t=tick %}
 			{% endfor %}
 		{% endif %}
+		
 	<!--<h2>{{user_name}}'s favorite areas</h2>
 		{% if user_areas %}
 		<ul>
