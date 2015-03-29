@@ -1,0 +1,12 @@
+{% if craggareas %}
+	<ul class="nav nav-sidebar">
+	{% for cragg in craggareas %}
+		{% if cragg == act_cragg %} <li class="active">{% else %}<li>{% endif %}
+			<a href="{% url 'craggarea' cragg.slug %}">{{ cragg.area_name }}</a></li>
+	{% endfor %}
+	
+{% else %}
+		<li> <strong> There are no craggs present.</strong></li>
+	
+	</ul>
+{% endif %}
