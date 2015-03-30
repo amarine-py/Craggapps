@@ -1,0 +1,30 @@
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
+
+{% block title %}Add User{% endblock %}
+
+{% block body_block %}
+
+	<h1>Add a new CraggApps User</h1>
+
+	{% if registered %}
+	<strong>Thank you for registering!</strong><br/>
+	<a href="{% url 'index' %}">Return to homepage</a><br/>
+	{% else %}
+	<h3>Register new CraggApps user here:</h3>
+
+	<form id="user_form" method="POST" action="/climbcast/add_cragg_user/", enctype="multipart/form-data">
+
+	{% csrf_token %}
+	
+	{{ user_form.as_p }}
+	{{ profile_form.as_p }}
+
+	<input type="submit" name="submit" value="Create CraggUser" />
+
+	</form>
+	{% endif %}
+
+{% endblock %}
+
+	

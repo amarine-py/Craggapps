@@ -132,54 +132,16 @@ def craggarea(request, area_name_slug):
         # If we can't, the .get() method raises a DoesNotExist exception.
         # So the .get() method returns one model instance or raises an exception.
         areas = CraggArea.objects.get(slug=area_name_slug)
+
+    except CraggArea.DoesNotExist:
+        # If area doesn't exist...
+        # Let the template handle it with a "no area" message.
+        pass
+
+    # Try to get weather for Yahoo
+    try:
         weather_yahoo = pywapi.get_weather_from_yahoo(areas.area_zip)
-        weather_com = pywapi.get_weather_from_weather_com(areas.area_zip)
-        weather_wunder = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/forecast/q/' + areas.area_zip +'.json')
-        wunder_string = weather_wunder.read()
-        wunder_parsed = json.loads(wunder_string)
-        context_dict['area_name'] = areas.area_name
-
-        # Note that filter returns >= 1 model instance.
-        a_c = areas.area_city
-        a_s = areas.area_state
         temp_f_yahoo = (int(weather_yahoo['condition']['temp']) * 9/5) + 32
-        temp_f_com = (int(weather_com['current_conditions']['temperature']) * 9/5) + 32
-        wunder_current = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/conditions/q/' + areas.area_zip +'.json')
-        wunder_current_string = wunder_current.read()
-        wunder_current_parsed = json.loads(wunder_current_string)
-        temp_f_wunder = int(wunder_current_parsed['current_observation']['temp_f'])
-
-        # Create empty lists for Weather.com forecast data
-        forecast_high_c_com = []
-        forecast_dayofweek_com = []
-        day_temp_com = []
-
-        # Populate forecast temps in celsius and convert fo fahrenheit (Weather.com)
-        for x in range(1,4):
-            forecast_high_c_com.append((int(weather_com['forecasts'][x]['high']) * 9/5) + 32)
-
-        # Populate days of week
-        for x in range(1,4):
-            forecast_dayofweek_com.append(weather_com['forecasts'][x]['day_of_week'])
-
-        # Zip the lists together for display
-        day_temp_com = zip(forecast_dayofweek_com, forecast_high_c_com)
-
-        # Create empty lists for Weather Underground forecast data
-        forecast_high_f_wunder = []
-        forecast_dayofweek_wunder = []
-        day_temp_wunder = []
-
-        # Populate forecast temps in farhenheit (Weather Underground)
-        for x in range(1,4):
-            forecast_high_f_wunder.append(wunder_parsed['forecast']['simpleforecast']['forecastday'][x]['high']['fahrenheit'])
-
-        # Populate days of week
-        for x in range(1,4):
-            forecast_dayofweek_wunder.append(wunder_parsed['forecast']['simpleforecast']['forecastday'][x]['date']['weekday'])
-                                          
-        # Zip the lists together for display
-        day_temp_wunder = zip(forecast_dayofweek_wunder, forecast_high_f_wunder)
 
         # Create empty lists for Yahoo forecast data
         forecast_high_c_yahoo = []
@@ -213,39 +175,108 @@ def craggarea(request, area_name_slug):
 
         # Zip the lists together for display
         day_temp_yahoo = zip(forecast_dayofweek_yahoo, forecast_high_c_yahoo)
-        
-        # Add variables into context dictionary.
-        context_dict['area_city'] = a_c
-        context_dict['area_state'] = a_s
+
+        # Put Yahoo variables into context
         context_dict['yahoo_temp_f'] = temp_f_yahoo
-        context_dict['com_temp_f'] = temp_f_com
-        context_dict['wunder_temp_f'] = temp_f_wunder
-        context_dict['day_temp_com'] = day_temp_com
         context_dict['day_temp_yahoo'] = day_temp_yahoo
+
+    except KeyError:
+        context_dict['yahoo_temp_f'] = "No data available from Yahoo."
+        context_dict['day_temp_yahoo'] = "No data available from Yahoo."
+
+
+    # Try to get data from Weather.com
+    try: 
+        weather_com = pywapi.get_weather_from_weather_com(areas.area_zip)
+        temp_f_com = (int(weather_com['current_conditions']['temperature']) * 9/5) + 32
+
+        # Create empty lists for Weather.com forecast data
+        forecast_high_c_com = []
+        forecast_dayofweek_com = []
+        day_temp_com = []
+
+        # Populate forecast temps in celsius and convert fo fahrenheit (Weather.com)
+        for x in range(1,4):
+            forecast_high_c_com.append((int(weather_com['forecasts'][x]['high']) * 9/5) + 32)
+
+        # Populate days of week
+        for x in range(1,4):
+            forecast_dayofweek_com.append(weather_com['forecasts'][x]['day_of_week'])
+
+        # Zip the lists together for display
+        day_temp_com = zip(forecast_dayofweek_com, forecast_high_c_com)
+
+        # Put Weather.com variables into context
+        context_dict['com_temp_f'] = temp_f_com
+        context_dict['day_temp_com'] = day_temp_com
+
+    except KeyError:
+        context_dict['com_temp_f'] = "No data available currently from Weather.com."
+        context_dict['day_temp_com'] = "No data available currently from Weather.com."
+
+        
+    # Try to get data from Weather Underground
+    try:
+        weather_wunder = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/forecast/q/' + areas.area_zip +'.json')
+        wunder_string = weather_wunder.read()
+        wunder_parsed = json.loads(wunder_string)
+        wunder_current = urllib2.urlopen('http://api.wunderground.com/api/060cb0792aec8a1c/conditions/q/' + areas.area_zip +'.json')
+        wunder_current_string = wunder_current.read()
+        wunder_current_parsed = json.loads(wunder_current_string)
+        temp_f_wunder = int(wunder_current_parsed['current_observation']['temp_f'])
+
+        # Create empty lists for Weather Underground forecast data
+        forecast_high_f_wunder = []
+        forecast_dayofweek_wunder = []
+        day_temp_wunder = []
+
+        # Populate forecast temps in farhenheit (Weather Underground)
+        for x in range(1,4):
+            forecast_high_f_wunder.append(wunder_parsed['forecast']['simpleforecast']['forecastday'][x]['high']['fahrenheit'])
+
+        # Populate days of week
+        for x in range(1,4):
+            forecast_dayofweek_wunder.append(wunder_parsed['forecast']['simpleforecast']['forecastday'][x]['date']['weekday'])
+                                          
+        # Zip the lists together for display
+        day_temp_wunder = zip(forecast_dayofweek_wunder, forecast_high_f_wunder)
+
+        # Add variables for Weather Underground into context
+        context_dict['wunder_temp_f'] = temp_f_wunder
         context_dict['day_temp_wunder'] = day_temp_wunder
+
+
+    except KeyError:
+        context_dict['wunder_temp_f'] = "No current data available for Weather Underground."
+        context_dict['day_temp_wunder'] = "No current data available for Weather Underground."
         
-        # Also add the area object from the database.
-        # We will use this in teh template to verify that the user exists.
-        context_dict['craggarea'] = areas
 
-        # Is area a favorite of current user?
-        current_user = UserProfile.objects.get(user__username=request.user)
-        user_list = areas.cragg_users.all()
-        
-        if current_user in user_list:
-            user_favorite = True
-        else:
-            user_favorite = False
+    # Add other variables into the context
+    context_dict['area_name'] = areas.area_name
+    context_dict['area_city'] = areas.area_city
+    context_dict['area_state'] = areas.area_state
 
-        context_dict['user_favorite'] = user_favorite
-        context_dict['current_user'] = current_user
+    # Also add the area object from the database.
+    # We will use this in teh template to verify that the user exists.
+    context_dict['craggarea'] = areas
 
-    except CraggArea.DoesNotExist:
-        # If area doesn't exist...
-        # Let the template handle it with a "no area" message.
-        pass
+    # Is area a favorite of current user?
+    current_user = UserProfile.objects.get(user__username=request.user)
+    user_list = areas.cragg_users.all()
+    
+    if current_user in user_list:
+        user_favorite = True
+    else:
+        user_favorite = False
 
+    context_dict['user_favorite'] = user_favorite
+    context_dict['current_user'] = current_user
+
+
+    # Finally, render the response
     return render (request, 'climbcast/craggarea.html', context_dict)
+
+
 
 def add_to_favorites(request, area_name_slug):
     # This view adds a given cragg to a user's favorites list.

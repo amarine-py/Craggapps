@@ -1,0 +1,26 @@
+{% extends 'climbcast/base.html' %}
+{% load staticfiles %}
+
+{% block title %}{{area_name}}{% endblock %}
+
+{% block body_block %}
+<div class="page-header">
+	<h1>{{ area_name }} Page</h1>
+</div>
+	You are {{ current_user }}
+	{% if user.is_authenticated %}
+		{% if not user_favorite %}
+			<a href="{% url 'add_to_favorites' craggarea.slug %}">Add this area to your favorites</a><br/>
+		{% else %}
+			This area is already in your favorites list. <br/>
+		{% endif %}
+	{% endif %}
+	
+	{% if craggarea %}
+		{% include "climbcast/include_area.html" with weather=craggarea.get_weather %}
+			
+	{% else %}
+		The specified area {{ area_name }} does not exist!
+	{% endif %}
+
+{% endblock %}

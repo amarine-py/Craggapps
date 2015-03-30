@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<title>ClimbCast|{% block title %}A CraggApp{% endblock%}</title>
+	</head>
+
+	<body>
+		<div>
+			{% block body_block %}
+		
+			{% endblock %}
+		</div>
+
+		<hr />
+
+		<div>
+			
+			{% if user.is_authenticated %}
+				<ul>
+					<li><a href="/climbcast/cragguser/{{user.userprofile.slug}}/">{{ user.username }}'s profile</a></li>
+					<li><a href="{% url 'auth_logout' %}?next=/climbcast/">Logout</a></li>
+					<li><a href="{% url 'route_form' %}">Add route</a></li>
+					<li><a href="{% url 'add_cragg_area' %}">Add new Cragg</a></li>
+					<li><a href="{% url 'about' %}">About ClimbCast</a></li>
+				</ul>
+			{% else %}
+				<ul>
+					<li><a href="{% url 'auth_login' %}">Login</a></li>
+					<li><a href="{% url 'registration_register' %}">Register as a new user</a></li>
+					<li><a href="{% url 'about' %}">About ClimbCast</a></li>
+				</ul>
+			{% endif %}
+			
+		</div>
+	</body>
+
+</html>
