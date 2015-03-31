@@ -8,25 +8,34 @@
 	
 	<h2>Weather.com 3-Day Forecast</h2> 
 	<h3>Highs for the week:</h3>
-
-		{% for x,y in weather.day_temp_com %}
-			{{x}}: {{y|center:"10"}}<br/>
-		{% endfor %}
+		{% if not com_temp_f %}
+			<p> No data currently available for Weather.com. </p>
+		{% else %}
+			{% for x,y in weather.day_temp_com %}
+				{{x}}: {{y|center:"10"}}<br/>
+			{% endfor %}
+		{% endif %}
 		
 	<br/>
 	
 	<h2>Yahoo 3-Day Forecast</h2>
 	<h3>Highs for the week:</h3>
-	
-		{% for x,y in weather.day_temp_yahoo %}
-			{{x}}: {{y|center:"10"}}<br/>
-		{% endfor %}
+		{% if not yahoo_temp_f %}
+			<p> No data currently available for Yahoo! </p>
+		{% else %}
+			{% for x,y in weather.day_temp_yahoo %}
+				{{x}}: {{y|center:"10"}}<br/>
+			{% endfor %}
+		{% endif %}
 		
 	<br/>
 	
 	<h2>Weather Underground 3-Day Forecast<h2/>
 	<h3>Highs for the week:</h3>
-	
-		{% for x,y in weather.day_temp_wunder %}
-			{{x}}: {{y|center:"10"}}<br/>
-		{% endfor %}
+		{% if not wunder_temp_f %}
+			<p> No data currently available for Weather Underground. </p>
+		{% else %}
+			{% for x,y in weather.day_temp_wunder %}
+				{{x}}: {{y|center:"10"}}<br/>
+			{% endfor %}
+		{% endif %}

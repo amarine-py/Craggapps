@@ -181,8 +181,8 @@ def craggarea(request, area_name_slug):
         context_dict['day_temp_yahoo'] = day_temp_yahoo
 
     except KeyError:
-        context_dict['yahoo_temp_f'] = "No data available from Yahoo."
-        context_dict['day_temp_yahoo'] = "No data available from Yahoo."
+        context_dict['yahoo_temp_f'] = False
+        context_dict['day_temp_yahoo'] = False
 
 
     # Try to get data from Weather.com
@@ -211,8 +211,8 @@ def craggarea(request, area_name_slug):
         context_dict['day_temp_com'] = day_temp_com
 
     except KeyError:
-        context_dict['com_temp_f'] = "No data available currently from Weather.com."
-        context_dict['day_temp_com'] = "No data available currently from Weather.com."
+        context_dict['com_temp_f'] = False
+        context_dict['day_temp_com'] = False
 
         
     # Try to get data from Weather Underground
@@ -247,9 +247,8 @@ def craggarea(request, area_name_slug):
 
 
     except KeyError:
-        context_dict['wunder_temp_f'] = "No current data available for Weather Underground."
-        context_dict['day_temp_wunder'] = "No current data available for Weather Underground."
-        
+        context_dict['wunder_temp_f'] = False
+        context_dict['day_temp_wunder'] = False        
 
     # Add other variables into the context
     context_dict['area_name'] = areas.area_name
@@ -261,16 +260,17 @@ def craggarea(request, area_name_slug):
     context_dict['craggarea'] = areas
 
     # Is area a favorite of current user?
-    current_user = UserProfile.objects.get(user__username=request.user)
-    user_list = areas.cragg_users.all()
-    
-    if current_user in user_list:
-        user_favorite = True
-    else:
-        user_favorite = False
+    if request.user.is_authenticated(): 
+        current_user = UserProfile.objects.get(user__username=request.user)
+        user_list = areas.cragg_users.all()
+        
+        if current_user in user_list:
+            user_favorite = True
+        else:
+            user_favorite = False
 
-    context_dict['user_favorite'] = user_favorite
-    context_dict['current_user'] = current_user
+        context_dict['user_favorite'] = user_favorite
+        context_dict['current_user'] = current_user
 
 
     # Finally, render the response
@@ -376,7 +376,11 @@ class TickDetailView(DetailView):
     slug_url_kwarg = 'slug'
     template_name = 'climbcast/routetick_detail.html'
 
+def logout(request):
+    from django.contrib import auth
+    auth.logout(request)
 
+    return HttpResponseRedirect("/climbcast/")
 
 
 

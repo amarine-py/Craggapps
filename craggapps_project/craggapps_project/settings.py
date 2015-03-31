@@ -119,9 +119,11 @@ PASSWORD_HASHERS = (
         'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
+'''
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': 'C:/Users/amarine/Documents/GitHub/Craggapps/craggapps_project/cache',
         }
     }
+'''

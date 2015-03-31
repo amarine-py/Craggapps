@@ -108,8 +108,8 @@ class CraggArea(models.Model):
             context_dict['day_temp_yahoo'] = day_temp_yahoo
 
         except KeyError:
-            context_dict['yahoo_temp_f'] = "No data available from Yahoo."
-            context_dict['day_temp_yahoo'] = "No data available from Yahoo."
+            context_dict['yahoo_temp_f'] = False
+            context_dict['day_temp_yahoo'] = False
 
 
         # Try to get data from Weather.com
@@ -138,8 +138,8 @@ class CraggArea(models.Model):
             context_dict['day_temp_com'] = day_temp_com
 
         except KeyError:
-            context_dict['com_temp_f'] = "No data available currently from Weather.com."
-            context_dict['day_temp_com'] = "No data available currently from Weather.com."
+            context_dict['com_temp_f'] = False
+            context_dict['day_temp_com'] = False
 
             
         # Try to get data from Weather Underground
@@ -174,8 +174,8 @@ class CraggArea(models.Model):
 
 
         except KeyError:
-            context_dict['wunder_temp_f'] = "No current data available for Weather Underground."
-            context_dict['day_temp_wunder'] = "No current data available for Weather Underground."
+            context_dict['wunder_temp_f'] = False
+            context_dict['day_temp_wunder'] = False
             
 
         # Add other variables into the context

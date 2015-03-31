@@ -7,8 +7,9 @@
 <div class="page-header">
 	<h1>{{ area_name }} Page</h1>
 </div>
-	You are {{ current_user }}
+	
 	{% if user.is_authenticated %}
+	You are {{ current_user }}
 		{% if not user_favorite %}
 			<a href="{% url 'add_to_favorites' craggarea.slug %}">Add this area to your favorites</a><br/>
 		{% else %}

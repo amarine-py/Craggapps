@@ -5,7 +5,7 @@ from registration.backends.simple.views import RegistrationView
 from registration.users import UserModel
 from climbcast.models import UserProfile
 from django.contrib.auth import authenticate
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from registration import signals
 
 # Create a new class that redirects the user to the index page,
